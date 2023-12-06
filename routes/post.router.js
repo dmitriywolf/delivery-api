@@ -6,7 +6,7 @@ import {
   create,
   remove,
   // update,
-} from '#root/controllers/postController.js';
+} from '#root/controllers/post.controller.js';
 import { postCreateValidation } from '#root/validation/index.js';
 import { handleValidationErrors, checkAuth } from '#root/middleware/index.js';
 

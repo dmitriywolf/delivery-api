@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { RES_ERRORS } from '#root/common/constants.js';
 
 export default (req, res, next) => {
   const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
@@ -10,13 +11,13 @@ export default (req, res, next) => {
       req.userId = decoded._id;
       next();
     } catch (e) {
-      return res.status(403).json({
-        message: 'No access',
+      return res.status(401).json({
+        message: RES_ERRORS.unauthorized,
       });
     }
   } else {
-    return res.status(403).json({
-      message: 'No access',
+    return res.status(401).json({
+      message: RES_ERRORS.unauthorized,
     });
   }
 };

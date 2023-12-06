@@ -1,18 +1,19 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-
+import { RES_ERRORS } from '#root/common/constants.js';
 import { UserModel } from '#root/models/index.js';
 
 export const register = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
     const doc = new UserModel({
+      firstName,
+      lastName,
       email,
-      fullName,
       passwordHash: hash,
     });
 
@@ -31,13 +32,13 @@ export const register = async (req, res) => {
     const { passwordHash, ...userData } = user._doc;
 
     res.json({
-      ...userData,
+      user: { ...userData },
       token,
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: 'Internal server error',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -48,7 +49,7 @@ export const login = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
-        message: 'User not found',
+        message: RES_ERRORS.not_found,
       });
     }
 
@@ -56,7 +57,7 @@ export const login = async (req, res) => {
 
     if (!isValidPass) {
       return res.status(400).json({
-        message: 'Wrong email or password',
+        message: RES_ERRORS.bad_request,
       });
     }
 
@@ -73,13 +74,13 @@ export const login = async (req, res) => {
     const { passwordHash, ...userData } = user._doc;
 
     res.json({
-      ...userData,
+      user: { ...userData },
       token,
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: 'Internal server error',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

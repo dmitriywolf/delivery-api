@@ -55,35 +55,11 @@ export const remove = async (req, res) => {
   try {
     const postId = req.params.id;
 
-    const result = await PostModel.findOneAndDelete(
-      {
-        _id: postId,
-      },
-      // (err, doc) => {
-      //   if (err) {
-      //     console.log(err);
-      //     return res.status(500).json({
-      //       message: 'Не удалось удалить статью',
-      //     });
-      //   }
-
-      //   if (!doc) {
-      //     return res.status(404).json({
-      //       message: 'Статья не найдена',
-      //     });
-      //   }
-
-      //   res.json({
-      //     success: true,
-      //   });
-      // },
-    );
-
-    // console.log(result);
+    const result = await PostModel.findOneAndDelete({
+      _id: postId,
+    });
 
     if (result) res.json({ msg: 'Success deleted' });
-
-    // res.json(result);
   } catch (err) {
     console.log(err);
     res.status(500).json({

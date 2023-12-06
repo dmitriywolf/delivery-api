@@ -1,3 +1,3 @@
-export { default as authRouter } from './authRouter.js';
-export { default as userRouter } from './userRouter.js';
-export { default as postRouter } from './postRouter.js';
+export { default as authRouter } from './auth.router.js';
+export { default as userRouter } from './user.router.js';
+export { default as postRouter } from './post.router.js';
