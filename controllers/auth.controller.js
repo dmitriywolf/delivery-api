@@ -1,39 +1,59 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { RES_ERRORS } from '#root/common/constants.js';
 import { UserModel } from '#root/models/index.js';
+import {
+  createActivateAccountToken,
+  createResetPasswordToken,
+  createAuthToken,
+  verifyActivateAccountToken,
+  verifyResetPasswordToken,
+  sendMail,
+} from '#root/utils/index.js';
+import { activateAccountTemplate, resetPasswordTemplate } from '#root/emailTemplates/index.js';
 
 export const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
+    // Проверка почты
+    const existedUser = await UserModel.findOne({
+      email,
+    });
+
+    if (existedUser) {
+      return res.status(400).json({ message: 'Email address already exists.' });
+    }
+
+    // Шифруем пароль
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const doc = new UserModel({
+    // Создаем пользователя
+    const newUser = new UserModel({
       firstName,
       lastName,
       email,
       passwordHash: hash,
     });
 
-    const user = await doc.save();
+    await newUser.save();
 
-    const token = jwt.sign(
-      {
-        _id: user._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      },
-    );
+    const activatAccountToken = createActivateAccountToken({
+      _id: newUser._id,
+    });
 
-    const { passwordHash, ...userData } = user._doc;
+    const activateUrl = `${process.env.BASE_URL}/auth/confirm-email/${activatAccountToken}`;
 
-    res.json({
-      user: { ...userData },
-      token,
+    await sendMail({
+      to: newUser.email,
+      userName: `${newUser.firstName} ${newUser.lastName}`,
+      emailLink: activateUrl,
+      subject: 'Activate your account',
+      template: activateAccountTemplate,
+    });
+
+    res.status(201).json({
+      message: 'Register success! Please activate your account to start.',
     });
   } catch (err) {
     console.log(err);
@@ -53,6 +73,12 @@ export const login = async (req, res) => {
       });
     }
 
+    if (!user.emailVerified) {
+      return res.status(400).json({
+        message: 'Activate your account',
+      });
+    }
+
     const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
 
     if (!isValidPass) {
@@ -61,26 +87,106 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      {
-        _id: user._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      },
-    );
+    const authAccountToken = createAuthToken({
+      _id: user._id,
+    });
 
     const { passwordHash, ...userData } = user._doc;
 
-    res.json({
+    res.status(200).json({
       user: { ...userData },
-      token,
+      token: authAccountToken,
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
+  }
+};
+
+export const activateEmail = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const activateToken = verifyActivateAccountToken(token);
+
+    const user = await UserModel.findById(activateToken._id);
+
+    if (!user) {
+      return res.status(400).json({ message: 'This account no longer exist.' });
+    }
+
+    if (user.emailVerified === true) {
+      return res.status(400).json({ message: 'Email address already verified.' });
+    }
+
+    await UserModel.findByIdAndUpdate(user.id, { emailVerified: true });
+
+    res.status(200).json({
+      message: 'Your account has beeen successfully verified.',
+    });
+  } catch (error) {
+    res.status(500).json({ message: RES_ERRORS.internal_server_error });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: 'This email does not exist.' });
+    }
+
+    const resetPasswordToken = createResetPasswordToken({
+      _id: user._id,
+    });
+
+    const resetUrl = `${process.env.BASE_URL}/auth/reset-password/${resetPasswordToken}`;
+
+    await sendMail({
+      to: email,
+      userName: `${user.firstName} ${user.lastName}`,
+      emailLink: resetUrl,
+      subject: 'Reset your password',
+      template: resetPasswordTemplate,
+    });
+
+    res.status(200).json({
+      message: 'An email has been sent to you, use it to reset your password.',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: RES_ERRORS.internal_server_error });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    const resetToken = verifyResetPasswordToken(token);
+
+    const user = await UserModel.findById(resetToken._id);
+
+    if (!user) {
+      return res.status(400).json({ message: 'This account no longer exist.' });
+    }
+
+    // Шифруем пароль
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+
+    await UserModel.findByIdAndUpdate(user._id, { passwordHash: hash });
+
+    res.status(200).json({
+      message: 'Your account password has beeen successfully updated.',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: RES_ERRORS.internal_server_error });
   }
 };

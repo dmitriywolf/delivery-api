@@ -1,4 +1,5 @@
 import { UserModel } from '#root/models/index.js';
+import { RES_ERRORS } from '#root/common/constants.js';
 
 export const getMe = async (req, res) => {
   try {
@@ -6,17 +7,17 @@ export const getMe = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
-        message: 'Пользователь не найден',
+        message: RES_ERRORS.not_found,
       });
     }
 
     const { passwordHash, ...userData } = user._doc;
 
-    res.json(userData);
+    res.status(200).json({ user: { ...userData } });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: 'Нет доступа',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
