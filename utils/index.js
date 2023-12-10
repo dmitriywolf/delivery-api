@@ -1,10 +1,10 @@
 export { default as AppError } from './appError.js';
 export { default as sendMail } from './email.js';
 export {
-  createActivateAccountToken,
-  verifyActivateAccountToken,
+  createVerifyEmailToken,
+  checkVerifyEmailToken,
   createResetPasswordToken,
-  verifyResetPasswordToken,
+  checkResetPasswordToken,
   createAuthToken,
-  verifyAuthToken,
+  checkAuthToken,
 } from './tokens.js';

@@ -1,5 +1,6 @@
 import express from 'express';
 import helmet from 'helmet';
+import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import morgan from 'morgan';
@@ -7,7 +8,6 @@ import { AppError } from '#root/utils/index.js';
 
 // import fs from 'fs';
 // import multer from 'multer';
-// import cors from 'cors';
 
 import { authRouter, userRouter, postRouter } from '#root/routes/index.js';
 
@@ -44,7 +44,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use(express.json());
-// app.use(cors());
+app.use(cors());
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());

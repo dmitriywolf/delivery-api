@@ -2,11 +2,11 @@ import bcrypt from 'bcrypt';
 import { RES_ERRORS } from '#root/common/constants.js';
 import { UserModel } from '#root/models/index.js';
 import {
-  createActivateAccountToken,
+  createVerifyEmailToken,
+  checkVerifyEmailToken,
   createResetPasswordToken,
+  checkResetPasswordToken,
   createAuthToken,
-  verifyActivateAccountToken,
-  verifyResetPasswordToken,
   sendMail,
 } from '#root/utils/index.js';
 import { activateAccountTemplate, resetPasswordTemplate } from '#root/emailTemplates/index.js';
@@ -21,7 +21,7 @@ export const register = async (req, res) => {
     });
 
     if (existedUser) {
-      return res.status(400).json({ message: 'Email address already exists.' });
+      return res.status(400).json({ message: 'Email address already exists' });
     }
 
     // Шифруем пароль
@@ -38,22 +38,22 @@ export const register = async (req, res) => {
 
     await newUser.save();
 
-    const activatAccountToken = createActivateAccountToken({
+    const activatAccountToken = createVerifyEmailToken({
       _id: newUser._id,
     });
 
-    const activateUrl = `${process.env.BASE_URL}/auth/confirm-email/${activatAccountToken}`;
+    const activateUrl = `${process.env.BASE_URL}/auth/verify-email/${activatAccountToken}`;
 
     await sendMail({
       to: newUser.email,
       userName: `${newUser.firstName} ${newUser.lastName}`,
       emailLink: activateUrl,
-      subject: 'Activate your account',
+      subject: 'Verify your email address',
       template: activateAccountTemplate,
     });
 
     res.status(201).json({
-      message: 'Register success! Please activate your account to start.',
+      message: 'Register success! Please check your email and activate your account to start',
     });
   } catch (err) {
     console.log(err);
@@ -69,13 +69,13 @@ export const login = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
-        message: RES_ERRORS.not_found,
+        message: 'Invalid login or password',
       });
     }
 
     if (!user.emailVerified) {
       return res.status(400).json({
-        message: 'Activate your account',
+        message: 'Please verify you email at first.',
       });
     }
 
@@ -83,7 +83,7 @@ export const login = async (req, res) => {
 
     if (!isValidPass) {
       return res.status(400).json({
-        message: RES_ERRORS.bad_request,
+        message: 'Invalid login or password',
       });
     }
 
@@ -105,13 +105,13 @@ export const login = async (req, res) => {
   }
 };
 
-export const activateEmail = async (req, res) => {
+export const verifyEmail = async (req, res) => {
   try {
-    const { token } = req.body;
+    const { code } = req.body;
 
-    const activateToken = verifyActivateAccountToken(token);
+    const activateToken = checkVerifyEmailToken(code);
 
-    const user = await UserModel.findById(activateToken._id);
+    const user = await UserModel.findById(activateToken?._id);
 
     if (!user) {
       return res.status(400).json({ message: 'This account no longer exist.' });
@@ -166,9 +166,9 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token, password } = req.body;
+    const { code, password } = req.body;
 
-    const resetToken = verifyResetPasswordToken(token);
+    const resetToken = checkResetPasswordToken(code);
 
     const user = await UserModel.findById(resetToken._id);
 
