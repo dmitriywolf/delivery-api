@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import { RES_ERRORS } from '#root/common/constants.js';
-import { UserModel } from '#root/models/index.js';
+import { RES_ERRORS, ROLES } from '#root/common/constants.js';
+import { AccountModel, JobSeekerModel, EmployerModel } from '#root/models/index.js';
 import {
   createVerifyEmailToken,
   checkVerifyEmailToken,
@@ -13,14 +13,14 @@ import { activateAccountTemplate, resetPasswordTemplate } from '#root/emailTempl
 
 export const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
 
     // Проверка почты
-    const existedUser = await UserModel.findOne({
+    const accountExist = await AccountModel.findOne({
       email,
     });
 
-    if (existedUser) {
+    if (accountExist) {
       return res.status(400).json({ message: 'Email address already exists' });
     }
 
@@ -28,25 +28,39 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    // Создаем пользователя
-    const newUser = new UserModel({
-      firstName,
-      lastName,
-      email,
-      passwordHash: hash,
-    });
+    let newAccount = null;
 
-    await newUser.save();
+    if (role === ROLES.jobSeeker) {
+      newAccount = new JobSeekerModel({
+        firstName,
+        lastName,
+        email,
+        passwordHash: hash,
+      });
+    } else if (role === ROLES.employer) {
+      newAccount = new EmployerModel({
+        firstName,
+        lastName,
+        email,
+        passwordHash: hash,
+      });
+    } else {
+      res.status(400).json({
+        message: 'Invalid input',
+      });
+    }
+
+    await newAccount.save();
 
     const activatAccountToken = createVerifyEmailToken({
-      _id: newUser._id,
+      _id: newAccount._id,
     });
 
     const activateUrl = `${process.env.BASE_URL}/auth/verify-email/${activatAccountToken}`;
 
     await sendMail({
-      to: newUser.email,
-      userName: `${newUser.firstName} ${newUser.lastName}`,
+      to: newAccount.email,
+      userName: `${newAccount.firstName} ${newAccount.lastName}`,
       emailLink: activateUrl,
       subject: 'Verify your email address',
       template: activateAccountTemplate,
@@ -65,21 +79,21 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
+    const account = await AccountModel.findOne({ email: req.body.email });
 
-    if (!user) {
+    if (!account) {
       return res.status(404).json({
         message: 'Invalid login or password',
       });
     }
 
-    if (!user.emailVerified) {
+    if (!account.emailVerified) {
       return res.status(400).json({
         message: 'Please verify you email at first.',
       });
     }
 
-    const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
+    const isValidPass = await bcrypt.compare(req.body.password, account._doc.passwordHash);
 
     if (!isValidPass) {
       return res.status(400).json({
@@ -88,10 +102,10 @@ export const login = async (req, res) => {
     }
 
     const authAccountToken = createAuthToken({
-      _id: user._id,
+      _id: account._id,
     });
 
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, __v, ...userData } = account._doc;
 
     res.status(200).json({
       user: { ...userData },
@@ -111,7 +125,7 @@ export const verifyEmail = async (req, res) => {
 
     const activateToken = checkVerifyEmailToken(code);
 
-    const user = await UserModel.findById(activateToken?._id);
+    const user = await AccountModel.findById(activateToken?._id);
 
     if (!user) {
       return res.status(400).json({ message: 'This account no longer exist.' });
@@ -121,12 +135,13 @@ export const verifyEmail = async (req, res) => {
       return res.status(400).json({ message: 'Email address already verified.' });
     }
 
-    await UserModel.findByIdAndUpdate(user.id, { emailVerified: true });
+    await AccountModel.findByIdAndUpdate(user.id, { emailVerified: true });
 
     res.status(200).json({
       message: 'Your account has beeen successfully verified.',
     });
   } catch (error) {
+    console.log('error', error);
     res.status(500).json({ message: RES_ERRORS.internal_server_error });
   }
 };
@@ -135,21 +150,21 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await UserModel.findOne({ email });
+    const account = await AccountModel.findOne({ email });
 
-    if (!user) {
+    if (!account) {
       return res.status(400).json({ message: 'This email does not exist.' });
     }
 
     const resetPasswordToken = createResetPasswordToken({
-      _id: user._id,
+      _id: account._id,
     });
 
     const resetUrl = `${process.env.BASE_URL}/auth/reset-password/${resetPasswordToken}`;
 
     await sendMail({
       to: email,
-      userName: `${user.firstName} ${user.lastName}`,
+      userName: `${account.firstName} ${account.lastName}`,
       emailLink: resetUrl,
       subject: 'Reset your password',
       template: resetPasswordTemplate,
@@ -170,9 +185,9 @@ export const resetPassword = async (req, res) => {
 
     const resetToken = checkResetPasswordToken(code);
 
-    const user = await UserModel.findById(resetToken._id);
+    const account = await AccountModel.findById(resetToken._id);
 
-    if (!user) {
+    if (!account) {
       return res.status(400).json({ message: 'This account no longer exist.' });
     }
 
@@ -180,7 +195,7 @@ export const resetPassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    await UserModel.findByIdAndUpdate(user._id, { passwordHash: hash });
+    await AccountModel.findByIdAndUpdate(account._id, { passwordHash: hash });
 
     res.status(200).json({
       message: 'Your account password has beeen successfully updated.',

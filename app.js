@@ -9,7 +9,7 @@ import { AppError } from '#root/utils/index.js';
 // import fs from 'fs';
 // import multer from 'multer';
 
-import { authRouter, userRouter, postRouter } from '#root/routes/index.js';
+import { authRouter, meRouter, postRouter } from '#root/routes/index.js';
 
 const app = express();
 
@@ -58,7 +58,7 @@ app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/auth', authRouter);
-app.use('/api/users', userRouter);
+app.use('/api/me', meRouter);
 app.use('/api/posts', postRouter);
 
 app.all('*', (req, res, next) => {

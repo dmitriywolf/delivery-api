@@ -12,3 +12,9 @@ export const RES_ERRORS = {
   not_found: 'NOT_FOUND', // 404
   internal_server_error: 'INTERNAL SERVER ERROR', // 500
 };
+
+export const ROLES = {
+  jobSeeker: 'job-seeker',
+  employer: 'employer',
+  admin: 'admin',
+};

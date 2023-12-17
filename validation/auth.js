@@ -10,6 +10,7 @@ export const registerValidation = [
   body('password', 'At least 8 characters').isLength({ min: 8 }),
   body('firstName', 'First name is required').isLength({ min: 2 }),
   body('lastName', 'Last name is required').isLength({ min: 2 }),
+  body('role', 'Role is required').isString(),
 ];
 
 export const verifyEmailValidation = [body('code', 'Code is required').isString()];
