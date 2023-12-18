@@ -9,7 +9,7 @@ import { AppError } from '#root/utils/index.js';
 // import fs from 'fs';
 // import multer from 'multer';
 
-import { authRouter, profileRouter, companyRouter } from '#root/routes/index.js';
+import { authRouter, profileRouter, companyRouter, resumeRouter } from '#root/routes/index.js';
 
 const app = express();
 
@@ -60,6 +60,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/companies', companyRouter);
+app.use('/api/resumes', resumeRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

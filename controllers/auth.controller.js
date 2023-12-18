@@ -1,6 +1,12 @@
 import bcrypt from 'bcrypt';
 import { RES_ERRORS, ROLES } from '#root/common/constants.js';
-import { AccountModel, SeekerModel, EmployerModel, CompanyModel } from '#root/models/index.js';
+import {
+  AccountModel,
+  SeekerModel,
+  EmployerModel,
+  CompanyModel,
+  ResumeModel,
+} from '#root/models/index.js';
 import {
   createVerifyEmailToken,
   checkVerifyEmailToken,
@@ -31,6 +37,7 @@ export const register = async (req, res) => {
     let account = null;
 
     if (role === ROLES.seeker) {
+      // Создаем нового сооискателя
       const seeker = new SeekerModel({
         firstName,
         lastName,
@@ -38,9 +45,27 @@ export const register = async (req, res) => {
         passwordHash: hash,
       });
 
-      const seekerData = await seeker.save();
+      await seeker.save();
 
-      account = seekerData._doc;
+      // Создаем для него РЕЗЮМЕ
+      const resume = new ResumeModel({
+        owner: seeker._id,
+      });
+
+      await resume.save();
+
+      // Присваиваем соискателю резюме
+      const updatedSeeker = await SeekerModel.findOneAndUpdate(
+        { _id: seeker._id },
+        {
+          resume: resume._id,
+        },
+        {
+          new: true,
+        },
+      );
+
+      account = updatedSeeker._doc;
     } else if (role === ROLES.employer) {
       // Создаем нового работодателя
       const employer = new EmployerModel({

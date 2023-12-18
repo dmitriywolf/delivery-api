@@ -24,6 +24,10 @@ const SeekerSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    resume: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Resume',
+    },
   },
   {
     timestamps: true,
