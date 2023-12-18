@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { RES_ERRORS, ROLES } from '#root/common/constants.js';
-import { AccountModel, JobSeekerModel, EmployerModel } from '#root/models/index.js';
+import { AccountModel, SeekerModel, EmployerModel, CompanyModel } from '#root/models/index.js';
 import {
   createVerifyEmailToken,
   checkVerifyEmailToken,
@@ -28,39 +28,65 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    let newAccount = null;
+    let account = null;
 
-    if (role === ROLES.jobSeeker) {
-      newAccount = new JobSeekerModel({
+    if (role === ROLES.seeker) {
+      const seeker = new SeekerModel({
         firstName,
         lastName,
         email,
         passwordHash: hash,
       });
+
+      const seekerData = await seeker.save();
+
+      account = seekerData._doc;
     } else if (role === ROLES.employer) {
-      newAccount = new EmployerModel({
+      // Создаем нового работодателя
+      const employer = new EmployerModel({
         firstName,
         lastName,
         email,
         passwordHash: hash,
       });
+
+      const employerData = await employer.save();
+
+      // Создаем под него компанию
+      const company = new CompanyModel({
+        employer: employerData._doc._id,
+        name: `${employerData._doc.firstName} ${employerData._doc.lastName}`,
+      });
+
+      const companyData = await company.save();
+
+      // Присваиваем роботодателю компанию
+      const updatedEmployer = await EmployerModel.findOneAndUpdate(
+        { _id: employerData._doc._id },
+        {
+          company: companyData._doc._id,
+        },
+        {
+          new: true,
+        },
+      );
+
+      account = updatedEmployer._doc;
     } else {
       res.status(400).json({
-        message: 'Invalid input',
+        message: 'Invalid user input',
       });
     }
 
-    await newAccount.save();
-
     const activatAccountToken = createVerifyEmailToken({
-      _id: newAccount._id,
+      _id: account._id,
     });
 
     const activateUrl = `${process.env.BASE_URL}/auth/verify-email/${activatAccountToken}`;
 
     await sendMail({
-      to: newAccount.email,
-      userName: `${newAccount.firstName} ${newAccount.lastName}`,
+      to: account.email,
+      userName: `${account.firstName} ${account.lastName}`,
       emailLink: activateUrl,
       subject: 'Verify your email address',
       template: activateAccountTemplate,

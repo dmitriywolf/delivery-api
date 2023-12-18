@@ -27,6 +27,14 @@ const AccountSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    phone: {
+      type: String,
+      default: '',
+    },
+    linkedin: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

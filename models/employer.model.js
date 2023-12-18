@@ -4,9 +4,21 @@ import AccountModel from './account.model.js';
 
 const EmployerSchema = new mongoose.Schema(
   {
-    company: {
+    position: {
       type: String,
       default: '',
+    },
+    country: {
+      type: String,
+      default: '',
+    },
+    hasHires: {
+      type: Boolean,
+      default: false,
+    },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
     },
   },
   {

@@ -14,7 +14,13 @@ export const RES_ERRORS = {
 };
 
 export const ROLES = {
-  jobSeeker: 'job-seeker',
-  employer: 'employer',
-  admin: 'admin',
+  seeker: 'Seeker',
+  employer: 'Employer',
+  admin: 'Admin',
+};
+
+export const SEEKER_SEARCH_STATUSES = {
+  active: 'active',
+  passive: 'passive',
+  offline: 'offline',
 };

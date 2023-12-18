@@ -1,15 +1,18 @@
 import mongoose from 'mongoose';
-import { ROLES } from '#root/common/constants.js';
+import { ROLES, SEEKER_SEARCH_STATUSES } from '#root/common/constants.js';
 import AccountModel from './account.model.js';
 
-const JobSeekerSchema = new mongoose.Schema(
+const SeekerSchema = new mongoose.Schema(
   {
-    // Contacts
-    phone: {
+    searchStatus: {
+      type: String,
+      default: SEEKER_SEARCH_STATUSES.active,
+    },
+    skype: {
       type: String,
       default: '',
     },
-    linkedin: {
+    telegram: {
       type: String,
       default: '',
     },
@@ -28,4 +31,4 @@ const JobSeekerSchema = new mongoose.Schema(
   },
 );
 
-export default AccountModel.discriminator(ROLES.jobSeeker, JobSeekerSchema);
+export default AccountModel.discriminator(ROLES.seeker, SeekerSchema);
