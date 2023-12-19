@@ -1,8 +1,8 @@
-import { ResumeModel } from '#root/models/index.js';
+import { Resume } from '#root/models/index.js';
 
 export const getAllResumes = async (req, res) => {
   try {
-    const resumes = await ResumeModel.find();
+    const resumes = await Resume.find();
     res.status(200).json({
       resumes,
     });
@@ -17,7 +17,7 @@ export const getAllResumes = async (req, res) => {
 export const getResumeById = async (req, res) => {
   try {
     const resumeId = req.params.id;
-    const result = await ResumeModel.findOne({ _id: resumeId }).populate('owner');
+    const result = await Resume.findOne({ _id: resumeId }).populate('owner');
     const resume = result._doc;
     const { passwordHash, __v, ...ownerView } = resume.owner._doc;
 
@@ -55,7 +55,7 @@ export const updateResumeById = async (req, res) => {
       employmentOptions,
     } = req.body;
 
-    const updatedResume = await ResumeModel.findOneAndUpdate(
+    const updatedResume = await Resume.findOneAndUpdate(
       { _id: resumeId },
       {
         position,

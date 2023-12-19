@@ -1,12 +1,6 @@
 import bcrypt from 'bcrypt';
 import { RES_ERRORS, ROLES } from '#root/common/constants.js';
-import {
-  AccountModel,
-  SeekerModel,
-  EmployerModel,
-  CompanyModel,
-  ResumeModel,
-} from '#root/models/index.js';
+import { Account, Seeker, Employer, Resume } from '#root/models/index.js';
 import {
   createVerifyEmailToken,
   checkVerifyEmailToken,
@@ -22,7 +16,7 @@ export const register = async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body;
 
     // Проверка почты
-    const accountExist = await AccountModel.findOne({
+    const accountExist = await Account.findOne({
       email,
     });
 
@@ -38,37 +32,27 @@ export const register = async (req, res) => {
 
     if (role === ROLES.seeker) {
       // Создаем нового сооискателя
-      const seeker = new SeekerModel({
+      const seeker = new Seeker({
         firstName,
         lastName,
         email,
         passwordHash: hash,
       });
 
-      await seeker.save();
-
       // Создаем для него РЕЗЮМЕ
-      const resume = new ResumeModel({
+      const resume = new Resume({
         owner: seeker._id,
       });
 
+      seeker.resume = resume._id;
+
+      const seekerData = await seeker.save();
       await resume.save();
 
-      // Присваиваем соискателю резюме
-      const updatedSeeker = await SeekerModel.findOneAndUpdate(
-        { _id: seeker._id },
-        {
-          resume: resume._id,
-        },
-        {
-          new: true,
-        },
-      );
-
-      account = updatedSeeker._doc;
+      account = seekerData._doc;
     } else if (role === ROLES.employer) {
       // Создаем нового работодателя
-      const employer = new EmployerModel({
+      const employer = new Employer({
         firstName,
         lastName,
         email,
@@ -77,26 +61,7 @@ export const register = async (req, res) => {
 
       const employerData = await employer.save();
 
-      // Создаем под него компанию
-      const company = new CompanyModel({
-        employer: employerData._doc._id,
-        name: `${employerData._doc.firstName} ${employerData._doc.lastName}`,
-      });
-
-      const companyData = await company.save();
-
-      // Присваиваем роботодателю компанию
-      const updatedEmployer = await EmployerModel.findOneAndUpdate(
-        { _id: employerData._doc._id },
-        {
-          company: companyData._doc._id,
-        },
-        {
-          new: true,
-        },
-      );
-
-      account = updatedEmployer._doc;
+      account = employerData._doc;
     } else {
       res.status(400).json({
         message: 'Invalid user input',
@@ -130,7 +95,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const account = await AccountModel.findOne({ email: req.body.email });
+    const account = await Account.findOne({ email: req.body.email });
 
     if (!account) {
       return res.status(404).json({
@@ -176,7 +141,7 @@ export const verifyEmail = async (req, res) => {
 
     const activateToken = checkVerifyEmailToken(code);
 
-    const user = await AccountModel.findById(activateToken?._id);
+    const user = await Account.findById(activateToken?._id);
 
     if (!user) {
       return res.status(400).json({ message: 'This account no longer exist.' });
@@ -186,7 +151,7 @@ export const verifyEmail = async (req, res) => {
       return res.status(400).json({ message: 'Email address already verified.' });
     }
 
-    await AccountModel.findByIdAndUpdate(user.id, { emailVerified: true });
+    await Account.findByIdAndUpdate(user.id, { emailVerified: true });
 
     res.status(200).json({
       message: 'Your account has beeen successfully verified.',
@@ -201,7 +166,7 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const account = await AccountModel.findOne({ email });
+    const account = await Account.findOne({ email });
 
     if (!account) {
       return res.status(400).json({ message: 'This email does not exist.' });
@@ -236,7 +201,7 @@ export const resetPassword = async (req, res) => {
 
     const resetToken = checkResetPasswordToken(code);
 
-    const account = await AccountModel.findById(resetToken._id);
+    const account = await Account.findById(resetToken._id);
 
     if (!account) {
       return res.status(400).json({ message: 'This account no longer exist.' });
@@ -246,7 +211,7 @@ export const resetPassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    await AccountModel.findByIdAndUpdate(account._id, { passwordHash: hash });
+    await Account.findByIdAndUpdate(account._id, { passwordHash: hash });
 
     res.status(200).json({
       message: 'Your account password has beeen successfully updated.',
@@ -254,5 +219,25 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: RES_ERRORS.internal_server_error });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const account = await Account.findById(req.userId);
+
+    if (!account) {
+      return res.status(404).json({
+        message: RES_ERRORS.not_found,
+      });
+    }
+
+    const { passwordHash, __v, ...accountData } = account._doc;
+    res.status(200).json({ user: { ...accountData } });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: RES_ERRORS.internal_server_error,
+    });
   }
 };

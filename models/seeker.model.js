@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { ROLES, SEEKER_SEARCH_STATUSES } from '#root/common/constants.js';
-import AccountModel from './account.model.js';
+import Account from './account.model.js';
 
 const SeekerSchema = new mongoose.Schema(
   {
@@ -35,4 +35,4 @@ const SeekerSchema = new mongoose.Schema(
   },
 );
 
-export default AccountModel.discriminator(ROLES.seeker, SeekerSchema);
+export default Account.discriminator(ROLES.seeker, SeekerSchema);

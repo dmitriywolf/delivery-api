@@ -1,24 +1,39 @@
 import mongoose from 'mongoose';
 import { ROLES } from '#root/common/constants.js';
-import AccountModel from './account.model.js';
+import Account from './account.model.js';
 
 const EmployerSchema = new mongoose.Schema(
   {
-    position: {
+    userPosition: {
       type: String,
       default: '',
     },
-    country: {
-      type: String,
-      default: '',
-    },
-    hasHires: {
-      type: Boolean,
-      default: false,
-    },
+    // Company info
     company: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
+      name: {
+        type: String,
+        default: '',
+      },
+      hiresCount: {
+        type: Boolean,
+        default: false,
+      },
+      webSite: {
+        type: String,
+        default: '',
+      },
+      douPage: {
+        type: String,
+        default: '',
+      },
+      logo: {
+        type: String,
+        default: '',
+      },
+      eployeesCount: {
+        type: Number,
+        default: 0,
+      },
     },
   },
   {
@@ -27,4 +42,4 @@ const EmployerSchema = new mongoose.Schema(
   },
 );
 
-export default AccountModel.discriminator(ROLES.employer, EmployerSchema);
+export default Account.discriminator(ROLES.employer, EmployerSchema);
