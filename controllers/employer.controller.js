@@ -14,6 +14,19 @@ export const getAllEmployers = async (req, res) => {
   }
 };
 
+export const getTopEmployers = async (req, res) => {
+  try {
+    const employers = await Employer.find();
+
+    res.status(200).json({ employers: employers.slice(0, 5) });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: RES_ERRORS.internal_server_error,
+    });
+  }
+};
+
 export const getEmployerById = async (req, res) => {
   try {
     const employerId = req.params.id;
@@ -39,43 +52,42 @@ export const getEmployerById = async (req, res) => {
 
 export const updateEmployerById = async (req, res) => {
   try {
-    const seekerId = req.params.id;
+    const employerId = req.params.id;
 
     const {
       firstName,
       lastName,
       phone,
       linkedin,
-      searchStatus,
-      skype,
-      telegram,
-      github,
-      portfolio,
+      userPosition,
+      company: { name, webSite, douPage, employeesCount },
     } = req.body;
 
-    const updatedSeeker = await Employer.findOneAndUpdate(
-      { _id: seekerId },
+    const updatedEmployer = await Employer.findOneAndUpdate(
+      { _id: employerId },
       {
         firstName,
         lastName,
         phone,
         linkedin,
-        searchStatus,
-        skype,
-        telegram,
-        github,
-        portfolio,
+        userPosition,
+        company: {
+          name,
+          webSite,
+          douPage,
+          employeesCount,
+        },
       },
       {
         new: true,
       },
     );
 
-    const { passwordHash, __v, ...accountData } = updatedSeeker._doc;
+    const { passwordHash, __v, ...accountData } = updatedEmployer._doc;
 
     res.status(200).json({ user: { ...accountData } });
   } catch (err) {
-    console.log('[updateSeeker]', err);
+    console.log('[updateEmpoyer]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });

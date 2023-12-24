@@ -63,6 +63,10 @@ const JobSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    applicationsCount: {
+      type: Number,
+      default: 0,
+    },
     applications: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'Seeker',

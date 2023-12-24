@@ -2,9 +2,23 @@ import { Job } from '#root/models/index.js';
 
 export const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate('author');
+    const jobs = await Job.find();
     res.status(200).json({
       jobs,
+    });
+  } catch (err) {
+    console.log('[getAllJobs]', err);
+    res.status(500).json({
+      message: 'Не удалось получить вакансии',
+    });
+  }
+};
+
+export const getTopJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find();
+    res.status(200).json({
+      jobs: jobs.slice(0, 4),
     });
   } catch (err) {
     console.log('[getAllJobs]', err);
@@ -87,6 +101,24 @@ export const createJob = async (req, res) => {
 
     res.status(500).json({
       message: 'Не удалось получить вакансию',
+    });
+  }
+};
+
+export const getJobsByEmployerId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const jobs = await Job.find({ author: userId });
+
+    res.status(200).json({
+      jobs,
+    });
+  } catch (err) {
+    console.log('[getОЩиіByUserId]', err);
+
+    res.status(500).json({
+      message: 'Не удалось получить вакансии',
     });
   }
 };
