@@ -4,6 +4,8 @@ export const DB_URI =
     : process.env.DATABASE_LOCALE;
 
 export const PORT = process.env.PORT || 3000;
+export const DEFAULT_USER_AVATAR = `${process.env.DOMAIN_URL}:${PORT}/images/avatar.jpg`;
+export const DEFAULT_COMPANY_LOGO = `${process.env.DOMAIN_URL}:${PORT}/images/company-logo.png`;
 
 export const RES_ERRORS = {
   bad_request: 'BAD_REQUEST', // 400
@@ -17,10 +19,4 @@ export const ROLES = {
   seeker: 'Seeker',
   employer: 'Employer',
   admin: 'Admin',
-};
-
-export const SEEKER_SEARCH_STATUSES = {
-  active: 'active',
-  passive: 'passive',
-  offline: 'offline',
 };

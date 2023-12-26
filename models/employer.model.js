@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ROLES } from '#root/common/constants.js';
+import { ROLES, DEFAULT_COMPANY_LOGO } from '#root/common/constants.js';
 import Account from './account.model.js';
 
 const EmployerSchema = new mongoose.Schema(
@@ -9,31 +9,33 @@ const EmployerSchema = new mongoose.Schema(
       default: '',
     },
     // Company info
-    company: {
-      name: {
-        type: String,
-        default: '',
-      },
-      hiresCount: {
-        type: Boolean,
-        default: false,
-      },
-      webSite: {
-        type: String,
-        default: '',
-      },
-      douPage: {
-        type: String,
-        default: '',
-      },
-      logo: {
-        type: String,
-        default: '',
-      },
-      eployeesCount: {
-        type: Number,
-        default: 0,
-      },
+    companyName: {
+      type: String,
+      default: '',
+    },
+    companyHiresCount: {
+      type: Boolean,
+      default: false,
+    },
+    companyWebSite: {
+      type: String,
+      default: '',
+    },
+    companyDouPage: {
+      type: String,
+      default: '',
+    },
+    companyLogo: {
+      type: String,
+      default: DEFAULT_COMPANY_LOGO,
+    },
+    companyEmployeesCount: {
+      type: Number,
+      default: 0,
+    },
+    companyDescription: {
+      type: String,
+      default: '',
     },
   },
   {

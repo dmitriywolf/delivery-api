@@ -63,10 +63,9 @@ export const createJob = async (req, res) => {
       skills,
       workExperience,
       experienceLevel,
-      salaryFrom,
+      salaryRange,
       country,
       city,
-      relocation,
       englishLevel,
       summary,
       companyType,
@@ -81,10 +80,9 @@ export const createJob = async (req, res) => {
       skills,
       workExperience,
       experienceLevel,
-      salaryFrom,
+      salaryRange,
       country,
       city,
-      relocation,
       englishLevel,
       summary,
       companyType,
@@ -97,10 +95,10 @@ export const createJob = async (req, res) => {
       job: jobData,
     });
   } catch (err) {
-    console.log('[getJobById]', err);
+    console.log('ERROR [createJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось получить вакансию',
+      message: 'Не удалось создать вакансию',
     });
   }
 };
@@ -116,6 +114,23 @@ export const getJobsByEmployerId = async (req, res) => {
     });
   } catch (err) {
     console.log('[getОЩиіByUserId]', err);
+
+    res.status(500).json({
+      message: 'Не удалось получить вакансии',
+    });
+  }
+};
+
+export const getMyVacancies = async (req, res) => {
+  try {
+    console.log('req.userId', req.userId);
+    const jobs = await Job.find({ author: req.userId });
+
+    res.status(200).json({
+      jobs,
+    });
+  } catch (err) {
+    console.log('ERROR [getMyVacancies]', err);
 
     res.status(500).json({
       message: 'Не удалось получить вакансии',

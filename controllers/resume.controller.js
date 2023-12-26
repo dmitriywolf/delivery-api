@@ -17,17 +17,10 @@ export const getAllResumes = async (req, res) => {
 export const getResumeById = async (req, res) => {
   try {
     const resumeId = req.params.id;
-    const result = await Resume.findOne({ _id: resumeId }).populate('owner');
-    const resume = result._doc;
-    const { passwordHash, __v, ...ownerView } = resume.owner._doc;
+    const resume = await Resume.findOne({ _id: resumeId });
 
     res.status(200).json({
-      resume: {
-        ...resume,
-        owner: {
-          ...ownerView,
-        },
-      },
+      resume,
     });
   } catch (err) {
     console.log('[getResumeById]', err);
@@ -53,6 +46,7 @@ export const updateResumeById = async (req, res) => {
       englishLevel,
       summary,
       employmentOptions,
+      isPublished,
     } = req.body;
 
     const updatedResume = await Resume.findOneAndUpdate(
@@ -69,6 +63,7 @@ export const updateResumeById = async (req, res) => {
         englishLevel,
         summary,
         employmentOptions,
+        isPublished,
       },
       {
         new: true,
@@ -82,12 +77,12 @@ export const updateResumeById = async (req, res) => {
     console.log('[updateResumeById]', err);
 
     res.status(500).json({
-      message: 'Не удалось обновить компанию',
+      message: 'Не удалось обновить резюме',
     });
   }
 };
 
-export const getResumeByUserId = async (req, res) => {
+export const getResumeByOwnerId = async (req, res) => {
   try {
     const userId = req.params.id;
 

@@ -57,10 +57,16 @@ export const updateEmployerById = async (req, res) => {
     const {
       firstName,
       lastName,
+      avatar,
       phone,
       linkedin,
       userPosition,
-      company: { name, webSite, douPage, employeesCount },
+      companyName,
+      companyWebSite,
+      companyDouPage,
+      companyLogo,
+      companyEmployeesCount,
+      companyDescription,
     } = req.body;
 
     const updatedEmployer = await Employer.findOneAndUpdate(
@@ -68,15 +74,16 @@ export const updateEmployerById = async (req, res) => {
       {
         firstName,
         lastName,
+        avatar,
         phone,
         linkedin,
         userPosition,
-        company: {
-          name,
-          webSite,
-          douPage,
-          employeesCount,
-        },
+        companyName,
+        companyWebSite,
+        companyDouPage,
+        companyLogo,
+        companyEmployeesCount,
+        companyDescription,
       },
       {
         new: true,

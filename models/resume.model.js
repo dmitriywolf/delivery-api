@@ -16,8 +16,8 @@ const ResumeSchema = new mongoose.Schema(
       default: '',
     },
     skills: {
-      type: Array,
-      default: [],
+      type: String,
+      default: '',
     },
     workExperience: {
       type: Number,
@@ -50,6 +50,10 @@ const ResumeSchema = new mongoose.Schema(
     employmentOptions: {
       type: String,
       default: '',
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
     },
   },
   {

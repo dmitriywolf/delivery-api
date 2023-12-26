@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
-import { ROLES, SEEKER_SEARCH_STATUSES } from '#root/common/constants.js';
+import { ROLES } from '#root/common/constants.js';
 import Account from './account.model.js';
 
 const SeekerSchema = new mongoose.Schema(
   {
     searchStatus: {
-      type: String,
-      default: SEEKER_SEARCH_STATUSES.active,
+      type: Boolean,
+      default: true,
     },
     skype: {
       type: String,

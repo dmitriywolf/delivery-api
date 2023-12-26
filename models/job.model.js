@@ -20,8 +20,8 @@ const JobSchema = new mongoose.Schema(
       default: '',
     },
     skills: {
-      type: Array,
-      default: [],
+      type: String,
+      default: '',
     },
     workExperience: {
       type: Number,
@@ -31,13 +31,13 @@ const JobSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    salaryFrom: {
-      type: Number,
-      default: 0,
+    salaryRange: {
+      type: String,
+      default: '',
     },
     country: {
       type: String,
-      default: 'Ukraine',
+      default: '',
     },
     city: {
       type: String,

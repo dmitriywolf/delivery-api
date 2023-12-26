@@ -18,6 +18,7 @@ import {
 } from '#root/routes/index.js';
 
 const app = express();
+app.use(express.static('public'));
 
 // const storage = multer.diskStorage({
 //   destination: (_, __, cb) => {

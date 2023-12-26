@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { DEFAULT_USER_AVATAR } from '#root/common/constants.js';
 
 const AccountSchema = new mongoose.Schema(
   {
@@ -25,7 +26,7 @@ const AccountSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: '',
+      default: DEFAULT_USER_AVATAR,
     },
     phone: {
       type: String,
