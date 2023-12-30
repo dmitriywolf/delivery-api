@@ -64,6 +64,9 @@ app.use('/uploads', express.static('uploads'));
 // });
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('HELLO TO JOB MAGAZINE API');
+});
 app.use('/api/auth', authRouter);
 app.use('/api/seekers', seekerRouter);
 app.use('/api/employers', employerRouter);
