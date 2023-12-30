@@ -2,23 +2,9 @@ import { Job } from '#root/models/index.js';
 
 export const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find();
+    const jobs = await Job.find().populate('author');
     res.status(200).json({
       jobs,
-    });
-  } catch (err) {
-    console.log('[getAllJobs]', err);
-    res.status(500).json({
-      message: 'Не удалось получить вакансии',
-    });
-  }
-};
-
-export const getTopJobs = async (req, res) => {
-  try {
-    const jobs = await Job.find();
-    res.status(200).json({
-      jobs: jobs.slice(0, 4),
     });
   } catch (err) {
     console.log('[getAllJobs]', err);
@@ -103,27 +89,62 @@ export const createJob = async (req, res) => {
   }
 };
 
-export const getJobsByEmployerId = async (req, res) => {
+export const updateJob = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const jobId = req.params.id;
 
-    const jobs = await Job.find({ author: userId });
+    const {
+      title,
+      category,
+      domain,
+      skills,
+      workExperience,
+      experienceLevel,
+      salaryRange,
+      country,
+      city,
+      englishLevel,
+      summary,
+      companyType,
+      employmentOptions,
+    } = req.body;
+
+    const updatedJob = await Job.findOneAndUpdate(
+      { _id: jobId },
+      {
+        title,
+        category,
+        domain,
+        skills,
+        workExperience,
+        experienceLevel,
+        salaryRange,
+        country,
+        city,
+        englishLevel,
+        summary,
+        companyType,
+        employmentOptions,
+      },
+      {
+        new: true,
+      },
+    );
 
     res.status(200).json({
-      jobs,
+      job: updatedJob,
     });
   } catch (err) {
-    console.log('[getОЩиіByUserId]', err);
+    console.log('ERROR [createJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось получить вакансии',
+      message: 'Не удалось создать вакансию',
     });
   }
 };
 
 export const getMyVacancies = async (req, res) => {
   try {
-    console.log('req.userId', req.userId);
     const jobs = await Job.find({ author: req.userId });
 
     res.status(200).json({

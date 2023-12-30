@@ -1,4 +1,4 @@
-import { Employer } from '#root/models/index.js';
+import { Employer, Job } from '#root/models/index.js';
 import { RES_ERRORS } from '#root/common/constants.js';
 
 export const getAllEmployers = async (req, res) => {
@@ -6,19 +6,6 @@ export const getAllEmployers = async (req, res) => {
     const employers = await Employer.find();
 
     res.status(200).json({ employers });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: RES_ERRORS.internal_server_error,
-    });
-  }
-};
-
-export const getTopEmployers = async (req, res) => {
-  try {
-    const employers = await Employer.find();
-
-    res.status(200).json({ employers: employers.slice(0, 5) });
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -39,9 +26,12 @@ export const getEmployerById = async (req, res) => {
       });
     }
 
+    // Get jobs
+    const jobs = await Job.find({ author: employerId }).populate('author');
+
     const { passwordHash, __v, ...employerData } = employer._doc;
 
-    res.status(200).json({ user: { ...employerData } });
+    res.status(200).json({ user: { ...employerData }, jobs });
   } catch (err) {
     console.log(err);
     res.status(500).json({
