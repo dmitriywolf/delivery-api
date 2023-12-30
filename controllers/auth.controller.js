@@ -72,7 +72,7 @@ export const register = async (req, res) => {
       _id: account._id,
     });
 
-    const activateUrl = `${process.env.BASE_URL}/auth/verify-email/${activatAccountToken}`;
+    const activateUrl = `${process.env.FRONT_DO}/auth/verify-email/${activatAccountToken}`;
 
     await sendMail({
       to: account.email,
@@ -176,7 +176,7 @@ export const forgotPassword = async (req, res) => {
       _id: account._id,
     });
 
-    const resetUrl = `${process.env.BASE_URL}/auth/reset-password/${resetPasswordToken}`;
+    const resetUrl = `${process.env.FRONT_DO}/auth/reset-password/${resetPasswordToken}`;
 
     await sendMail({
       to: email,
