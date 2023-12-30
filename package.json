@@ -1,10 +1,11 @@
 {
-  "name": "delivery-api",
+  "name": "jobmagazin-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
