@@ -59,6 +59,11 @@ const JobSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    viewsCount: {
+      type: Number,
+      default: 0,
+    },
+    applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Seeker' }],
   },
   {
     timestamps: true,

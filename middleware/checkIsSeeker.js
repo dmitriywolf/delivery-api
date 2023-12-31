@@ -1,8 +1,8 @@
 import { Seeker } from '#root/models/index.js';
 
-export default (req, res, next) => {
+export default async (req, res, next) => {
   try {
-    const seeker = Seeker.findOne({ _id: req.userId });
+    const seeker = await Seeker.findOne({ _id: req.userId });
 
     if (seeker) {
       next();

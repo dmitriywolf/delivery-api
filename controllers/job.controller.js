@@ -1,4 +1,4 @@
-import { Job } from '#root/models/index.js';
+import { Job, Seeker } from '#root/models/index.js';
 
 export const getAllJobs = async (req, res) => {
   try {
@@ -18,7 +18,16 @@ export const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
 
-    const result = await Job.findOne({ _id: jobId }).populate('author');
+    const result = await Job.findOneAndUpdate(
+      { _id: jobId },
+      {
+        $inc: { viewsCount: 1 },
+      },
+      {
+        returnDocument: 'after',
+      },
+    ).populate('author');
+
     const job = result._doc;
 
     const { passwordHash, __v, ...authorView } = job.author._doc;
@@ -135,17 +144,21 @@ export const updateJob = async (req, res) => {
       job: updatedJob,
     });
   } catch (err) {
-    console.log('ERROR [createJob]', err);
+    console.log('ERROR [updateJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось создать вакансию',
+      message: 'Не удалось обновить вакансию',
     });
   }
 };
 
 export const getMyVacancies = async (req, res) => {
   try {
-    const jobs = await Job.find({ author: req.userId });
+    const jobs = await Job.find({ author: req.userId }).populate('applications', [
+      '_id',
+      'firstName',
+      'lastName',
+    ]);
 
     res.status(200).json({
       jobs,
@@ -155,6 +168,30 @@ export const getMyVacancies = async (req, res) => {
 
     res.status(500).json({
       message: 'Не удалось получить вакансии',
+    });
+  }
+};
+
+export const applyToJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const seekerId = req.userId;
+
+    const applyIsExist = await Job.findOne({ applications: seekerId });
+
+    if (applyIsExist) {
+      return res.status(400).json({ message: 'You already applied' });
+    }
+
+    await Job.findOneAndUpdate({ _id: jobId }, { $push: { applications: seekerId } });
+    await Seeker.findOneAndUpdate({ _id: seekerId }, { $push: { applications: jobId } });
+
+    res.status(201).json({ message: 'Success' });
+  } catch (err) {
+    console.log('[applyToJob]', err);
+
+    res.status(500).json({
+      message: 'Не удалось получить вакансию',
     });
   }
 };

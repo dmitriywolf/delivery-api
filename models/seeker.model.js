@@ -28,6 +28,7 @@ const SeekerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Resume',
     },
+    applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
   },
   {
     timestamps: true,

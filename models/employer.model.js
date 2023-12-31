@@ -8,7 +8,6 @@ const EmployerSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    // Company info
     companyName: {
       type: String,
       default: '',
