@@ -31,6 +31,22 @@ export const getResumeById = async (req, res) => {
   }
 };
 
+export const getMyResume = async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ owner: req.userId });
+
+    res.status(200).json({
+      resume,
+    });
+  } catch (err) {
+    console.log('[getMyResume]', err);
+
+    res.status(500).json({
+      message: 'Не удалось получить резюме',
+    });
+  }
+};
+
 export const updateResumeById = async (req, res) => {
   try {
     const resumeId = req.params.id;
