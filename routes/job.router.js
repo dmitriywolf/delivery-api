@@ -6,6 +6,7 @@ import {
   updateJob,
   getMyVacancies,
   applyToJob,
+  getMyApplications,
 } from '#root/controllers/job.controller.js';
 import { checkAuth, checkIsSeeker } from '#root/middleware/index.js';
 
@@ -19,5 +20,6 @@ router.patch('/:id', checkAuth, updateJob);
 router.get('/employer/all', checkAuth, getMyVacancies);
 
 router.post('/apply-job/:id', checkAuth, checkIsSeeker, applyToJob);
+router.get('/applications/my', checkAuth, checkIsSeeker, getMyApplications);
 
 export default router;

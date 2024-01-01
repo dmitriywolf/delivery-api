@@ -1,4 +1,4 @@
-import { Job, Seeker } from '#root/models/index.js';
+import { Job } from '#root/models/index.js';
 
 export const getAllJobs = async (req, res) => {
   try {
@@ -29,6 +29,8 @@ export const getJobById = async (req, res) => {
     ).populate('author');
 
     const job = result._doc;
+
+    console.log(job);
 
     const { passwordHash, __v, ...authorView } = job.author._doc;
 
@@ -138,7 +140,7 @@ export const updateJob = async (req, res) => {
       {
         new: true,
       },
-    );
+    ).populate('applications', ['_id', 'firstName', 'lastName']);
 
     res.status(200).json({
       job: updatedJob,
@@ -177,21 +179,36 @@ export const applyToJob = async (req, res) => {
     const jobId = req.params.id;
     const seekerId = req.userId;
 
-    const applyIsExist = await Job.findOne({ applications: seekerId });
+    const applyIsExist = await Job.findOne({ _id: jobId, applications: seekerId });
 
     if (applyIsExist) {
       return res.status(400).json({ message: 'You already applied' });
     }
 
     await Job.findOneAndUpdate({ _id: jobId }, { $push: { applications: seekerId } });
-    await Seeker.findOneAndUpdate({ _id: seekerId }, { $push: { applications: jobId } });
 
-    res.status(201).json({ message: 'Success' });
+    res.status(201).json({ seekerId });
   } catch (err) {
     console.log('[applyToJob]', err);
 
     res.status(500).json({
       message: 'Не удалось получить вакансию',
+    });
+  }
+};
+
+export const getMyApplications = async (req, res) => {
+  try {
+    const seekerId = req.userId;
+
+    const applications = await Job.find({ applications: seekerId }).populate('author');
+
+    res.status(200).json({ applications });
+  } catch (err) {
+    console.log('[applyToJob]', err);
+
+    res.status(500).json({
+      message: 'Не удалось получить мои отклики',
     });
   }
 };

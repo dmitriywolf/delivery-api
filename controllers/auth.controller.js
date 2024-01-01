@@ -224,7 +224,7 @@ export const resetPassword = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    const account = await Account.findById(req.userId).populate('applications');
+    const account = await Account.findById(req.userId);
 
     if (!account) {
       return res.status(404).json({
