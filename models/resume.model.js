@@ -13,7 +13,7 @@ const ResumeSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      default: '',
+      default: 'Not Selected',
     },
     skills: {
       type: String,
@@ -41,15 +41,27 @@ const ResumeSchema = new mongoose.Schema(
     },
     englishLevel: {
       type: String,
-      default: '',
+      default: 'no',
     },
     summary: {
       type: String,
       default: '',
     },
-    employmentOptions: {
-      type: String,
-      default: '',
+    remoteWork: {
+      type: Boolean,
+      default: false,
+    },
+    office: {
+      type: Boolean,
+      default: false,
+    },
+    freelance: {
+      type: Boolean,
+      default: false,
+    },
+    partTime: {
+      type: Boolean,
+      default: false,
     },
     isPublished: {
       type: Boolean,
