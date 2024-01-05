@@ -13,15 +13,19 @@ const ResumeSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      default: 'Not Selected',
+      default: '',
     },
     skills: {
-      type: String,
-      default: '',
+      type: [String],
+      default: [],
     },
     workExperience: {
       type: Number,
       default: 0,
+    },
+    experienceLevel: {
+      type: String,
+      default: '',
     },
     salaryExpectations: {
       type: Number,
@@ -29,7 +33,7 @@ const ResumeSchema = new mongoose.Schema(
     },
     country: {
       type: String,
-      default: 'Ukraine',
+      default: '',
     },
     city: {
       type: String,
@@ -41,27 +45,19 @@ const ResumeSchema = new mongoose.Schema(
     },
     englishLevel: {
       type: String,
-      default: 'no',
+      default: '',
     },
     summary: {
       type: String,
       default: '',
     },
-    remoteWork: {
-      type: Boolean,
-      default: false,
+    employment: {
+      type: [String],
+      default: [],
     },
-    office: {
-      type: Boolean,
-      default: false,
-    },
-    freelance: {
-      type: Boolean,
-      default: false,
-    },
-    partTime: {
-      type: Boolean,
-      default: false,
+    dontConsider: {
+      type: [String],
+      default: [],
     },
     isPublished: {
       type: Boolean,

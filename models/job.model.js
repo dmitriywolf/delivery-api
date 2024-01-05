@@ -37,7 +37,7 @@ const JobSchema = new mongoose.Schema(
     },
     country: {
       type: String,
-      default: '',
+      default: 'Ukraine',
     },
     city: {
       type: String,
