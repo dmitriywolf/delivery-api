@@ -11,17 +11,17 @@ const JobSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    category: {
-      type: String,
-      default: '',
-    },
     domain: {
       type: String,
       default: '',
     },
-    skills: {
+    category: {
       type: String,
       default: '',
+    },
+    skills: {
+      type: [String],
+      default: [],
     },
     workExperience: {
       type: Number,
@@ -37,7 +37,7 @@ const JobSchema = new mongoose.Schema(
     },
     country: {
       type: String,
-      default: 'Ukraine',
+      default: '',
     },
     city: {
       type: String,
@@ -55,13 +55,17 @@ const JobSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    employmentOptions: {
-      type: String,
-      default: '',
+    employment: {
+      type: [String],
+      default: [],
     },
     viewsCount: {
       type: Number,
       default: 0,
+    },
+    isArchive: {
+      type: Boolean,
+      default: false,
     },
     applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Seeker' }],
   },

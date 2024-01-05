@@ -66,7 +66,7 @@ export const createJob = async (req, res) => {
       englishLevel,
       summary,
       companyType,
-      employmentOptions,
+      employment,
     } = req.body;
 
     const job = new Job({
@@ -83,7 +83,7 @@ export const createJob = async (req, res) => {
       englishLevel,
       summary,
       companyType,
-      employmentOptions,
+      employment,
     });
 
     const jobData = await job.save();
@@ -117,7 +117,8 @@ export const updateJob = async (req, res) => {
       englishLevel,
       summary,
       companyType,
-      employmentOptions,
+      employment,
+      isArchive,
     } = req.body;
 
     const updatedJob = await Job.findOneAndUpdate(
@@ -135,7 +136,8 @@ export const updateJob = async (req, res) => {
         englishLevel,
         summary,
         companyType,
-        employmentOptions,
+        employment,
+        isArchive,
       },
       {
         new: true,
