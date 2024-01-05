@@ -44,20 +44,7 @@ export const updateEmployerById = async (req, res) => {
   try {
     const employerId = req.params.id;
 
-    const {
-      firstName,
-      lastName,
-      avatar,
-      phone,
-      linkedin,
-      userPosition,
-      companyName,
-      companyWebSite,
-      companyDouPage,
-      companyLogo,
-      companyEmployeesCount,
-      companyDescription,
-    } = req.body;
+    const { firstName, lastName, avatar, phone, linkedin, userPosition } = req.body;
 
     const updatedEmployer = await Employer.findOneAndUpdate(
       { _id: employerId },
@@ -68,12 +55,6 @@ export const updateEmployerById = async (req, res) => {
         phone,
         linkedin,
         userPosition,
-        companyName,
-        companyWebSite,
-        companyDouPage,
-        companyLogo,
-        companyEmployeesCount,
-        companyDescription,
       },
       {
         new: true,
@@ -85,6 +66,47 @@ export const updateEmployerById = async (req, res) => {
     res.status(200).json({ user: { ...accountData } });
   } catch (err) {
     console.log('[updateEmpoyer]', err);
+    res.status(500).json({
+      message: RES_ERRORS.internal_server_error,
+    });
+  }
+};
+
+export const updateCompanyById = async (req, res) => {
+  try {
+    const employerId = req.params.id;
+
+    const {
+      companyName,
+      companyWebSite,
+      companyDouPage,
+      companyLogo,
+      companyEmployeesCount,
+      companyDescription,
+      companyOffices,
+    } = req.body;
+
+    const updatedCompany = await Employer.findOneAndUpdate(
+      { _id: employerId },
+      {
+        companyName,
+        companyWebSite,
+        companyDouPage,
+        companyLogo,
+        companyEmployeesCount,
+        companyDescription,
+        companyOffices,
+      },
+      {
+        new: true,
+      },
+    );
+
+    const { passwordHash, __v, ...accountData } = updatedCompany._doc;
+
+    res.status(200).json({ user: { ...accountData } });
+  } catch (err) {
+    console.log('[updateCompany]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });

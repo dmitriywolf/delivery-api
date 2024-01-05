@@ -36,6 +36,10 @@ const EmployerSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    companyOffices: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
