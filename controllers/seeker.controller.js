@@ -1,5 +1,6 @@
 import { Seeker } from '#root/models/index.js';
 import { RES_ERRORS } from '#root/common/constants.js';
+import { clearImage } from '#root/utils/index.js';
 
 export const getAllSeekers = async (req, res) => {
   try {
@@ -45,33 +46,41 @@ export const updateSeekerById = async (req, res) => {
       firstName,
       lastName,
       phone,
-      avatar,
       linkedin,
       searchStatus,
       skype,
       telegram,
       github,
       portfolio,
+      avatar,
     } = req.body;
 
-    const updatedSeeker = await Seeker.findOneAndUpdate(
-      { _id: seekerId },
-      {
-        firstName,
-        lastName,
-        phone,
-        avatar,
-        linkedin,
-        searchStatus,
-        skype,
-        telegram,
-        github,
-        portfolio,
-      },
-      {
-        new: true,
-      },
-    );
+    let avatarUrl;
+
+    if (req.file) {
+      avatarUrl = req.file.path.replace('\\', '/');
+    } else {
+      avatarUrl = avatar;
+    }
+
+    const seeker = await Seeker.findById(seekerId);
+
+    if (avatarUrl !== seeker.avatar) {
+      clearImage(seeker.avatar);
+    }
+
+    seeker.firstName = firstName;
+    seeker.lastName = lastName;
+    seeker.phone = phone;
+    seeker.avatar = avatarUrl;
+    seeker.linkedin = linkedin;
+    seeker.searchStatus = searchStatus;
+    seeker.skype = skype;
+    seeker.telegram = telegram;
+    seeker.github = github;
+    seeker.portfolio = portfolio;
+
+    const updatedSeeker = await seeker.save();
 
     const { passwordHash, __v, ...accountData } = updatedSeeker._doc;
 

@@ -8,3 +8,4 @@ export {
   createAuthToken,
   checkAuthToken,
 } from './tokens.js';
+export { default as clearImage } from './clearImage.js';

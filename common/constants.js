@@ -4,8 +4,8 @@ export const DB_URI =
     : process.env.DATABASE_LOCALE;
 
 export const PORT = process.env.PORT || 3000;
-export const DEFAULT_USER_AVATAR = `${process.env.BACK_DOMAIN}/images/avatar.jpg`;
-export const DEFAULT_COMPANY_LOGO = `${process.env.BACK_DOMAIN}/images/company-logo.png`;
+export const DEFAULT_USER_AVATAR = `${process.env.BACK_DOMAIN}/uploads/avatar.jpg`;
+export const DEFAULT_COMPANY_LOGO = `${process.env.BACK_DOMAIN}/uploads/company-logo.png`;
 
 export const RES_ERRORS = {
   bad_request: 'BAD_REQUEST', // 400

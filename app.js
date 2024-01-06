@@ -1,13 +1,15 @@
 import express from 'express';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import multer from 'multer';
 import helmet from 'helmet';
 import cors from 'cors';
-import { rateLimit } from 'express-rate-limit';
+import { v4 as uuidv4 } from 'uuid';
+// import { rateLimit } from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import morgan from 'morgan';
 import { AppError } from '#root/utils/index.js';
-import { checkAuth } from './middleware/index.js';
 
 import {
   authRouter,
@@ -17,8 +19,10 @@ import {
   jobRouter,
 } from '#root/routes/index.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-app.use(express.static('public'));
 
 const storage = multer.diskStorage({
   destination: (_, __, cb) => {
@@ -28,42 +32,37 @@ const storage = multer.diskStorage({
     cb(null, 'uploads');
   },
   filename: (_, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, uuidv4() + file.originalname);
   },
 });
 
 const upload = multer({ storage });
 
 // Set security HTTP headers
-app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-const limiter = rateLimit({
-  limit: 100,
-  windowMs: 15 * 60 * 1000,
-  message: 'Too many request from this IP, please try again in an hour!',
-});
+// const limiter = rateLimit({
+//   limit: 100,
+//   windowMs: 15 * 60 * 1000,
+//   message: 'Too many request from this IP, please try again in an hour!',
+// });
 // Apply the rate limiting middleware to all requests.
-app.use(limiter);
+// app.use(limiter);
 
 app.use(express.json());
-app.use(cors());
+app.use(upload.single('image'));
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Загрузка картинок
-app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
-  res.json({
-    url: `/uploads/${req.file.originalname}`,
-  });
-});
+app.use(cors());
 
 // Routes
 app.get('/', (req, res) => {
