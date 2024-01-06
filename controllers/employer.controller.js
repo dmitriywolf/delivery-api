@@ -1,5 +1,6 @@
 import { Employer, Job } from '#root/models/index.js';
 import { RES_ERRORS } from '#root/common/constants.js';
+import { clearImage } from '#root/utils/index.js';
 
 export const getAllEmployers = async (req, res) => {
   try {
@@ -46,20 +47,28 @@ export const updateEmployerById = async (req, res) => {
 
     const { firstName, lastName, avatar, phone, linkedin, userPosition } = req.body;
 
-    const updatedEmployer = await Employer.findOneAndUpdate(
-      { _id: employerId },
-      {
-        firstName,
-        lastName,
-        avatar,
-        phone,
-        linkedin,
-        userPosition,
-      },
-      {
-        new: true,
-      },
-    );
+    let avatarUrl;
+
+    if (req.file) {
+      avatarUrl = req.file.path.replace('\\', '/');
+    } else {
+      avatarUrl = avatar;
+    }
+
+    const employer = await Employer.findById(employerId);
+
+    if (avatarUrl !== employer.avatar) {
+      clearImage(employer.avatar);
+    }
+
+    employer.firstName = firstName;
+    employer.lastName = lastName;
+    employer.avatar = avatarUrl;
+    employer.phone = phone;
+    employer.linkedin = linkedin;
+    employer.userPosition = userPosition;
+
+    const updatedEmployer = await employer.save();
 
     const { passwordHash, __v, ...accountData } = updatedEmployer._doc;
 
@@ -86,21 +95,29 @@ export const updateCompanyById = async (req, res) => {
       companyOffices,
     } = req.body;
 
-    const updatedCompany = await Employer.findOneAndUpdate(
-      { _id: employerId },
-      {
-        companyName,
-        companyWebSite,
-        companyDouPage,
-        companyLogo,
-        companyEmployeesCount,
-        companyDescription,
-        companyOffices,
-      },
-      {
-        new: true,
-      },
-    );
+    let logoUrl;
+
+    if (req.file) {
+      logoUrl = req.file.path.replace('\\', '/');
+    } else {
+      logoUrl = companyLogo;
+    }
+
+    const employer = await Employer.findById(employerId);
+
+    if (logoUrl !== employer.companyLogo) {
+      clearImage(employer.companyLogo);
+    }
+
+    employer.companyName = companyName;
+    employer.companyWebSite = companyWebSite;
+    employer.companyDouPage = companyDouPage;
+    employer.companyLogo = logoUrl;
+    employer.companyEmployeesCount = companyEmployeesCount;
+    employer.companyDescription = companyDescription;
+    employer.companyOffices = companyOffices;
+
+    const updatedCompany = await employer.save();
 
     const { passwordHash, __v, ...accountData } = updatedCompany._doc;
 
