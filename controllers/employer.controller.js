@@ -4,7 +4,7 @@ import { clearImage } from '#root/utils/index.js';
 
 export const getAllEmployers = async (req, res) => {
   try {
-    const employers = await Employer.find({ isPublished: true });
+    const employers = await Employer.find({ isPublished: true }).sort({ createdAt: -1 });
 
     res.status(200).json({ employers });
   } catch (err) {

@@ -2,7 +2,7 @@ import { Job } from '#root/models/index.js';
 
 export const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate('author');
+    const jobs = await Job.find().populate('author').sort({ createdAt: -1 });
     res.status(200).json({
       jobs,
     });
@@ -158,12 +158,9 @@ export const updateJob = async (req, res) => {
 
 export const getMyVacancies = async (req, res) => {
   try {
-    const jobs = await Job.find({ author: req.userId }).populate('applications', [
-      '_id',
-      'firstName',
-      'lastName',
-      'resume',
-    ]);
+    const jobs = await Job.find({ author: req.userId })
+      .populate('applications', ['_id', 'firstName', 'lastName', 'resume'])
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       jobs,
@@ -204,7 +201,9 @@ export const getMyApplications = async (req, res) => {
   try {
     const seekerId = req.userId;
 
-    const applications = await Job.find({ applications: seekerId }).populate('author');
+    const applications = await Job.find({ applications: seekerId })
+      .populate('author')
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ applications });
   } catch (err) {
