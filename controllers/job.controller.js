@@ -142,7 +142,7 @@ export const updateJob = async (req, res) => {
       {
         new: true,
       },
-    ).populate('applications', ['_id', 'firstName', 'lastName']);
+    ).populate('applications', ['_id', 'firstName', 'lastName', 'resume']);
 
     res.status(200).json({
       job: updatedJob,
@@ -162,6 +162,7 @@ export const getMyVacancies = async (req, res) => {
       '_id',
       'firstName',
       'lastName',
+      'resume',
     ]);
 
     res.status(200).json({

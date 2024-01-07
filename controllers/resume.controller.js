@@ -2,7 +2,7 @@ import { Resume } from '#root/models/index.js';
 
 export const getAllResumes = async (req, res) => {
   try {
-    const resumes = await Resume.find();
+    const resumes = await Resume.find().populate('owner');
     res.status(200).json({
       resumes,
     });
@@ -17,7 +17,7 @@ export const getAllResumes = async (req, res) => {
 export const getResumeById = async (req, res) => {
   try {
     const resumeId = req.params.id;
-    const resume = await Resume.findOne({ _id: resumeId });
+    const resume = await Resume.findOne({ _id: resumeId }).populate('owner');
 
     res.status(200).json({
       resume,
