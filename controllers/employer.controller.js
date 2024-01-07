@@ -4,7 +4,7 @@ import { clearImage } from '#root/utils/index.js';
 
 export const getAllEmployers = async (req, res) => {
   try {
-    const employers = await Employer.find();
+    const employers = await Employer.find({ isPublished: true });
 
     res.status(200).json({ employers });
   } catch (err) {
@@ -116,6 +116,7 @@ export const updateCompanyById = async (req, res) => {
     employer.companyEmployeesCount = companyEmployeesCount;
     employer.companyDescription = companyDescription;
     employer.companyOffices = companyOffices;
+    employer.isPublished = true;
 
     const updatedCompany = await employer.save();
 

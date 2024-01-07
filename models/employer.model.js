@@ -40,6 +40,10 @@ const EmployerSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    isPublished: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

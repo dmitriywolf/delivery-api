@@ -6,7 +6,10 @@ export const getAllSeekers = async (req, res) => {
   try {
     const seekers = await Seeker.find().populate('resume');
 
-    res.status(200).json({ seekers });
+    // Only published
+    const publishedSeekers = seekers.filter((c) => !!c.resume.isPublished);
+
+    res.status(200).json({ seekers: publishedSeekers });
   } catch (err) {
     console.log(err);
     res.status(500).json({
