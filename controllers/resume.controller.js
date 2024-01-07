@@ -2,7 +2,7 @@ import { Resume } from '#root/models/index.js';
 
 export const getAllResumes = async (req, res) => {
   try {
-    const resumes = await Resume.find().populate('owner');
+    const resumes = await Resume.find({ isPublished: true }).populate('owner');
     res.status(200).json({
       resumes,
     });
