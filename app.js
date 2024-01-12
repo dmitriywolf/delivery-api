@@ -1,7 +1,7 @@
 import express from 'express';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import multer from 'multer';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -17,10 +17,12 @@ import {
   employerRouter,
   resumeRouter,
   jobRouter,
+  chatRouter,
+  messageRouter,
+  docRouter,
 } from '#root/routes/index.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
@@ -55,12 +57,12 @@ if (process.env.NODE_ENV === 'development') {
 // app.use(limiter);
 
 app.use(express.json());
-app.use(upload.single('image'));
+app.use(upload.single('file'));
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(join(__dirname, 'uploads')));
 
 app.use(cors());
 
@@ -73,6 +75,9 @@ app.use('/api/seekers', seekerRouter);
 app.use('/api/employers', employerRouter);
 app.use('/api/resumes', resumeRouter);
 app.use('/api/jobs', jobRouter);
+app.use('/api/chats', chatRouter);
+app.use('/api/messages', messageRouter);
+app.use('/api/docs', docRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

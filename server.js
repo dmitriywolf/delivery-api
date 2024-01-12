@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
 import { DB_URI, PORT } from '#root/common/constants.js';
 import app from '#root/app.js';
 
@@ -9,12 +11,39 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
+const server = createServer(app);
+const io = new Server(server);
+
+let users = [];
+
+io.on('connection', (socket) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+  socket.on('message', (data) => {
+    io.emit('messageResponse', data);
+  });
+
+  socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
+
+  socket.on('newUser', (data) => {
+    users.push(data);
+    io.emit('newUserResponse', users);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('🔥: A user disconnected');
+    users = users.filter((user) => user.socketID !== socket.id);
+    io.emit('newUserResponse', users);
+    socket.disconnect();
+  });
+});
+
 async function main() {
   try {
     await mongoose.connect(DB_URI);
     console.log('Successful connection to the database');
-    app.listen(PORT, () => {
-      console.log(`App running on: ${PORT}`);
+
+    server.listen(PORT, () => {
+      console.log(`server running at http://localhost:${PORT}`);
     });
   } catch (err) {
     return console.log(err);
