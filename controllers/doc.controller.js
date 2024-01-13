@@ -3,7 +3,7 @@ import { clearImage } from '#root/utils/index.js';
 
 export const createDoc = async (req, res) => {
   try {
-    const { title, docUrl } = req.body;
+    const { title, docUrl, type, size, filename } = req.body;
 
     let documentUrl;
 
@@ -13,7 +13,7 @@ export const createDoc = async (req, res) => {
       documentUrl = docUrl;
     }
 
-    const doc = new Doc({ title, owner: req.userId, url: documentUrl });
+    const doc = new Doc({ title, owner: req.userId, url: documentUrl, type, size, filename });
 
     const savedDoc = await doc.save();
 
@@ -30,7 +30,7 @@ export const createDoc = async (req, res) => {
 
 export const getMyDocs = async (req, res) => {
   try {
-    const docs = await Doc.find({ owner: req.userId });
+    const docs = await Doc.find({ owner: req.userId }).sort({ createdAt: -1 });
 
     res.status(200).json({
       docs,
@@ -43,28 +43,11 @@ export const getMyDocs = async (req, res) => {
   }
 };
 
-export const getDocsByCompanyId = async (req, res) => {
-  try {
-    const { companyId } = req.params;
-
-    const docs = await Doc.find({ owner: companyId });
-
-    res.status(200).json({
-      docs,
-    });
-  } catch (err) {
-    console.log('[getDocsByCompanyId]', err);
-    res.status(500).json({
-      message: 'Не удалось получить документы компании',
-    });
-  }
-};
-
 export const editDoc = async (req, res) => {
   try {
     const { docId } = req.params;
 
-    const { title, docUrl } = req.body;
+    const { title, docUrl, type, size, filename } = req.body;
 
     let documentUrl;
 
@@ -82,6 +65,9 @@ export const editDoc = async (req, res) => {
 
     doc.title = title;
     doc.url = documentUrl;
+    doc.size = size;
+    doc.filename = filename;
+    doc.type = type;
 
     const updatedDoc = await doc.save();
 
@@ -98,11 +84,17 @@ export const removeDoc = async (req, res) => {
   try {
     const { docId } = req.params;
 
+    const doc = await Doc.findById(docId);
+
+    if (doc.filename && doc.size) {
+      clearImage(doc.url);
+    }
+
     const result = await Doc.findByIdAndDelete(docId);
 
     console.log('RES delete', result);
 
-    res.status(201).json({ message: 'Deleted' });
+    res.status(201).json({ _id: docId });
   } catch (err) {
     console.log('[removeDoc]', err);
     res.status(500).json({

@@ -1,4 +1,4 @@
-import { Employer, Job } from '#root/models/index.js';
+import { Employer, Job, Doc } from '#root/models/index.js';
 import { RES_ERRORS } from '#root/common/constants.js';
 import { clearImage } from '#root/utils/index.js';
 
@@ -32,7 +32,10 @@ export const getEmployerById = async (req, res) => {
 
     const { passwordHash, __v, ...employerData } = employer._doc;
 
-    res.status(200).json({ user: { ...employerData }, jobs });
+    // Get docs
+    const docs = await Doc.find({ owner: employerId });
+
+    res.status(200).json({ user: { ...employerData }, jobs, docs });
   } catch (err) {
     console.log(err);
     res.status(500).json({

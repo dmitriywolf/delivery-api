@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
     cb(null, 'uploads');
   },
   filename: (_, file, cb) => {
-    cb(null, uuidv4() + file.originalname);
+    cb(null, `${uuidv4()}-${file.originalname}`);
   },
 });
 

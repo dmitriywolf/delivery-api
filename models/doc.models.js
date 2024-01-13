@@ -11,6 +11,10 @@ const DocSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    filename: {
+      type: String,
+      default: '',
+    },
     title: {
       type: String,
       default: '',
