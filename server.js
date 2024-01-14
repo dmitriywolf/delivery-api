@@ -12,12 +12,17 @@ process.on('uncaughtException', (err) => {
 });
 
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONT_DOMAIN,
+  },
+});
 
 let users = [];
 
 io.on('connection', (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
+
   socket.on('message', (data) => {
     io.emit('messageResponse', data);
   });
@@ -26,12 +31,15 @@ io.on('connection', (socket) => {
 
   socket.on('newUser', (data) => {
     users.push(data);
+    console.log('USERS', users);
     io.emit('newUserResponse', users);
   });
 
   socket.on('disconnect', () => {
     console.log('🔥: A user disconnected');
+
     users = users.filter((user) => user.socketID !== socket.id);
+    console.log('USERS', users);
     io.emit('newUserResponse', users);
     socket.disconnect();
   });
