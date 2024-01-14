@@ -48,7 +48,7 @@ export const getMyChats = async (req, res) => {
 export const getChat = async (req, res) => {
   try {
     const { id } = req.params;
-    const chat = await Chat.findById(id);
+    const chat = await Chat.findById(id).populate('members');
     res.status(200).json({
       chat,
     });
