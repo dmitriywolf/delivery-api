@@ -1,4 +1,4 @@
-import { Chat } from '#root/models/index.js';
+import { Chat, Message } from '#root/models/index.js';
 
 export const createChat = async (req, res) => {
   try {
@@ -13,14 +13,21 @@ export const createChat = async (req, res) => {
     });
 
     if (existedChat) {
-      return res.status(200).json({ chat: existedChat });
+      const messages = await Message.find({ chatId: existedChat._id });
+
+      return res.status(200).json({
+        chat: { ...existedChat, messages },
+      });
     }
 
     const newChat = new Chat({ members: [req.userId, receiverId] });
     const savedChat = await newChat.save();
 
     res.status(200).json({
-      chat: savedChat,
+      chat: {
+        ...savedChat,
+        messages: [],
+      },
     });
   } catch (err) {
     console.log('[createChat]', err);
@@ -49,8 +56,10 @@ export const getChat = async (req, res) => {
   try {
     const { id } = req.params;
     const chat = await Chat.findById(id).populate('members');
+    const messages = await Message.find({ chatId: id });
+
     res.status(200).json({
-      chat,
+      chat: { ...chat._doc, messages },
     });
   } catch (err) {
     console.log('[getChat]', err);
