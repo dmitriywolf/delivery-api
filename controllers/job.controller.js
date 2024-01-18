@@ -14,6 +14,20 @@ export const getAllJobs = async (req, res) => {
   }
 };
 
+export const getTotalJobsCount = async (req, res) => {
+  try {
+    const jobs = await Job.find();
+    res.status(200).json({
+      total: jobs.length,
+    });
+  } catch (err) {
+    console.log('[gettotalJobs]', err);
+    res.status(500).json({
+      message: 'Не удалось получить количество вакансий',
+    });
+  }
+};
+
 export const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
