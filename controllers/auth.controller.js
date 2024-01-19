@@ -2,17 +2,14 @@ import bcrypt from 'bcrypt';
 import { RES_ERRORS, ROLES } from '#root/common/constants.js';
 import { Account, Seeker, Employer, Resume } from '#root/models/index.js';
 import {
-  // createVerifyEmailToken,
+  createVerifyEmailToken,
   checkVerifyEmailToken,
   createResetPasswordToken,
   checkResetPasswordToken,
   createAuthToken,
   sendMail,
 } from '#root/utils/index.js';
-import {
-  //  activateAccountTemplate,
-  resetPasswordTemplate,
-} from '#root/emailTemplates/index.js';
+import { activateAccountTemplate, resetPasswordTemplate } from '#root/emailTemplates/index.js';
 
 export const register = async (req, res) => {
   try {
@@ -63,34 +60,31 @@ export const register = async (req, res) => {
       });
 
       const employerData = await employer.save();
-
       account = employerData._doc;
-      console.log(account);
     } else {
       res.status(400).json({
         message: 'Invalid user input',
       });
     }
 
-    // const activatAccountToken = createVerifyEmailToken({
-    //   _id: account._id,
-    // });
+    const activatAccountToken = createVerifyEmailToken({
+      _id: account._id,
+    });
 
-    // const activateUrl = `${process.env.FRONT_DOMAIN}/auth/verify-email/${activatAccountToken}`;
+    const activateUrl = `${process.env.FRONT_DOMAIN}/auth/verify-email/${activatAccountToken}`;
 
-    // await sendMail({
-    //   to: account.email,
-    //   userName: `${account.firstName} ${account.lastName}`,
-    //   emailLink: activateUrl,
-    //   subject: 'Verify your email address',
-    //   template: activateAccountTemplate,
-    // });
+    await sendMail({
+      to: account.email,
+      userName: `${account.firstName} ${account.lastName}`,
+      emailLink: activateUrl,
+      subject: 'Verify your email address',
+      template: activateAccountTemplate,
+    });
 
     res.status(201).json({
       message: 'Register success! Please check your email and activate your account to start',
     });
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
@@ -109,7 +103,7 @@ export const login = async (req, res) => {
 
     if (!account.emailVerified) {
       return res.status(400).json({
-        message: 'Please verify you email at first.',
+        message: 'Please verify you email at first',
       });
     }
 
@@ -148,17 +142,17 @@ export const verifyEmail = async (req, res) => {
     const user = await Account.findById(activateToken?._id);
 
     if (!user) {
-      return res.status(400).json({ message: 'This account no longer exist.' });
+      return res.status(400).json({ message: 'This account no longer exist' });
     }
 
     if (user.emailVerified === true) {
-      return res.status(400).json({ message: 'Email address already verified.' });
+      return res.status(400).json({ message: 'Email address already verified' });
     }
 
     await Account.findByIdAndUpdate(user.id, { emailVerified: true });
 
     res.status(200).json({
-      message: 'Your account has beeen successfully verified.',
+      message: 'Your account has been successfully verified',
     });
   } catch (error) {
     console.log('error', error);
@@ -173,7 +167,7 @@ export const forgotPassword = async (req, res) => {
     const account = await Account.findOne({ email });
 
     if (!account) {
-      return res.status(400).json({ message: 'This email does not exist.' });
+      return res.status(400).json({ message: 'This email does not exist' });
     }
 
     const resetPasswordToken = createResetPasswordToken({
@@ -191,7 +185,7 @@ export const forgotPassword = async (req, res) => {
     });
 
     res.status(200).json({
-      message: 'An email has been sent to you, use it to reset your password.',
+      message: 'An email has been sent to you, use it to reset your password',
     });
   } catch (error) {
     console.log(error);
@@ -208,7 +202,7 @@ export const resetPassword = async (req, res) => {
     const account = await Account.findById(resetToken._id);
 
     if (!account) {
-      return res.status(400).json({ message: 'This account no longer exist.' });
+      return res.status(400).json({ message: 'This account no longer exist' });
     }
 
     // Шифруем пароль
@@ -218,7 +212,7 @@ export const resetPassword = async (req, res) => {
     await Account.findByIdAndUpdate(account._id, { passwordHash: hash });
 
     res.status(200).json({
-      message: 'Your account password has beeen successfully updated.',
+      message: 'Your account password has beeen successfully updated',
     });
   } catch (error) {
     console.log(error);
