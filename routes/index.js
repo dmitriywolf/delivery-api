@@ -6,3 +6,4 @@ export { default as jobRouter } from './job.router.js';
 export { default as chatRouter } from './chat.router.js';
 export { default as messageRouter } from './message.router.js';
 export { default as docRouter } from './doc.router.js';
+export { default as statsRouter } from './stats.router.js';
