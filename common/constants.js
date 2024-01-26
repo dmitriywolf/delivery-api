@@ -23,16 +23,9 @@ export const ROLES = {
   admin: 'Admin',
 };
 
-export const EXPERIENCE_LEVELS = [
-  'Trainee/Intern',
-  'Junior',
-  'Middle',
-  'Senior',
-  'Team Lead',
-  'Chief/Head of',
-];
+export const EXPERIENCE_LEVELS = ['Trainee', 'Junior', 'Middle', 'Senior', 'Lead', 'Chief'];
 
-export const EMPLOYMENT = ['Remote work', 'Office', 'Part-time', 'Freelance (one-time projects)'];
+export const EMPLOYMENT = ['Remote', 'Office', 'Part-time', 'Freelance'];
 
 export const ENGLISH_LEVELS = [
   'No English',

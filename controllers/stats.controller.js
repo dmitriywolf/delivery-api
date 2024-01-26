@@ -52,6 +52,31 @@ export const getLevelStat = async (req, res) => {
   }
 };
 
+export const getSalaryExpectationStat = async (req, res) => {
+  try {
+    const resumes = await Resume.find({ isPublished: true });
+
+    const stat = EXPERIENCE_LEVELS.map((level) => {
+      const levelResumes = resumes.filter((r) => r.experienceLevel === level);
+      const total = levelResumes.reduce((acc, r) => acc + r.salaryExpectations, 0);
+
+      return {
+        level,
+        Salary: levelResumes.length ? total / levelResumes.length : 0,
+      };
+    });
+
+    res.status(200).json({
+      stat,
+    });
+  } catch (err) {
+    console.log('[getLevelStat]', err);
+    res.status(500).json({
+      message: 'Не удалось получить статистику',
+    });
+  }
+};
+
 export const getEnglishStat = async (req, res) => {
   try {
     const resumes = await Resume.find({ isPublished: true });
