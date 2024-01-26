@@ -33,3 +33,12 @@ export const EXPERIENCE_LEVELS = [
 ];
 
 export const EMPLOYMENT = ['Remote work', 'Office', 'Part-time', 'Freelance (one-time projects)'];
+
+export const ENGLISH_LEVELS = [
+  'No English',
+  'Beginner/Elementary',
+  'Pre-Intermediate',
+  'Intermediate',
+  'Upper-Intermediate',
+  'Advanced/Fluent',
+];

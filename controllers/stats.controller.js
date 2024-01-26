@@ -1,10 +1,10 @@
 import { Resume, Job, Employer } from '#root/models/index.js';
-import { EXPERIENCE_LEVELS, EMPLOYMENT } from '#root/common/constants.js';
+import { EXPERIENCE_LEVELS, EMPLOYMENT, ENGLISH_LEVELS } from '#root/common/constants.js';
 
 export const getTotalStat = async (req, res) => {
   try {
-    const companies = await Employer.find();
-    const resumes = await Resume.find();
+    const companies = await Employer.find({ isPublished: true });
+    const resumes = await Resume.find({ isPublished: true });
     const jobs = await Job.find();
 
     res.status(200).json({
@@ -27,7 +27,7 @@ export const getTotalStat = async (req, res) => {
 
 export const getLevelStat = async (req, res) => {
   try {
-    const resumes = await Resume.find();
+    const resumes = await Resume.find({ isPublished: true });
     const jobs = await Job.find();
 
     const stat = EXPERIENCE_LEVELS.map((level) => {
@@ -52,9 +52,46 @@ export const getLevelStat = async (req, res) => {
   }
 };
 
+export const getEnglishStat = async (req, res) => {
+  try {
+    const resumes = await Resume.find({ isPublished: true });
+    const jobs = await Job.find();
+
+    const vacancies = ENGLISH_LEVELS.map((el) => {
+      const count = jobs.filter((j) => j.englishLevel === el)?.length || 0;
+
+      return {
+        name: el,
+        value: Math.round((count / jobs.length) * 10000) / 100,
+      };
+    });
+
+    const candidates = ENGLISH_LEVELS.map((el) => {
+      const count = resumes.filter((r) => r.englishLevel === el)?.length || 0;
+
+      return {
+        name: el,
+        value: Math.round((count / resumes.length) * 10000) / 100,
+      };
+    });
+
+    res.status(200).json({
+      stat: {
+        vacancies,
+        candidates,
+      },
+    });
+  } catch (err) {
+    console.log('[getLevelStat]', err);
+    res.status(500).json({
+      message: 'Не удалось получить статистику',
+    });
+  }
+};
+
 export const getEmploymentStat = async (req, res) => {
   try {
-    const resumes = await Resume.find();
+    const resumes = await Resume.find({ isPublished: true });
     const jobs = await Job.find();
 
     const stat = EMPLOYMENT.map((employment) => {
@@ -82,7 +119,7 @@ export const getEmploymentStat = async (req, res) => {
 
 export const getNotConsiderDomainsStat = async (req, res) => {
   try {
-    const resumes = await Resume.find();
+    const resumes = await Resume.find({ isPublished: true });
 
     const stat = {
       adult: 0,
