@@ -6,3 +6,4 @@ export { default as Job } from './job.model.js';
 export { default as Chat } from './chat.model.js';
 export { default as Message } from './message.model.js';
 export { default as Doc } from './doc.models.js';
+export { default as Notification } from './notification.model.js';

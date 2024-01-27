@@ -1,4 +1,5 @@
-import { Job } from '#root/models/index.js';
+import { Job, Notification, Seeker } from '#root/models/index.js';
+import { NOTIFICATION_TYPES } from '#root/common/constants.js';
 
 export const getAllJobs = async (req, res) => {
   try {
@@ -199,7 +200,34 @@ export const applyToJob = async (req, res) => {
       return res.status(400).json({ message: 'You already applied' });
     }
 
-    await Job.findOneAndUpdate({ _id: jobId }, { $push: { applications: seekerId } });
+    const updatedJob = await Job.findOneAndUpdate(
+      { _id: jobId },
+      { $push: { applications: seekerId } },
+      {
+        new: true,
+      },
+    );
+
+    const seeker = await Seeker.findById(seekerId);
+
+    // Создаем нотификацию
+    const notification = new Notification({
+      userId: updatedJob.author._id,
+      type: NOTIFICATION_TYPES.applyToJob,
+      data: {
+        job: {
+          id: updatedJob._id,
+          title: updatedJob.title,
+        },
+        seeker: {
+          id: seeker._id,
+          name: `${seeker.firstName} ${seeker.lastName}`,
+          avatar: seeker.avatar,
+        },
+      },
+    });
+
+    await notification.save();
 
     res.status(201).json({ seekerId });
   } catch (err) {

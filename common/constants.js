@@ -35,3 +35,7 @@ export const ENGLISH_LEVELS = [
   'Upper-Intermediate',
   'Advanced/Fluent',
 ];
+
+export const NOTIFICATION_TYPES = {
+  applyToJob: 'application-to-job',
+};

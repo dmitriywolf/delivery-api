@@ -21,6 +21,7 @@ import {
   messageRouter,
   docRouter,
   statsRouter,
+  notificationsRouter,
 } from '#root/routes/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -80,6 +81,7 @@ app.use('/api/chats', chatRouter);
 app.use('/api/messages', messageRouter);
 app.use('/api/docs', docRouter);
 app.use('/api/statistics', statsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
