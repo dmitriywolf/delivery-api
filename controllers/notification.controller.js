@@ -26,7 +26,7 @@ export const readNotification = async (req, res) => {
       },
     );
 
-    res.status(200).json({ updated: true });
+    res.status(200).json({ watchedId: notificationId });
   } catch (err) {
     console.log('[editDoc]', err);
     res.status(500).json({

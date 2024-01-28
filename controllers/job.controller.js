@@ -220,7 +220,7 @@ export const applyToJob = async (req, res) => {
           title: updatedJob.title,
         },
         seeker: {
-          id: seeker._id,
+          id: seeker.resume,
           name: `${seeker.firstName} ${seeker.lastName}`,
           avatar: seeker.avatar,
         },
