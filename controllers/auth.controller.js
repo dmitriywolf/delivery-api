@@ -15,7 +15,7 @@ export const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, role } = req.body;
 
-    // Проверка почты
+    // Check email
     const accountExist = await Account.findOne({
       email,
     });
@@ -24,14 +24,14 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'Email address already exists' });
     }
 
-    // Шифруем пароль
+    // Password
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
     let account = null;
 
     if (role === ROLES.seeker) {
-      // Создаем нового сооискателя
+      // Make new seeker account
       const seeker = new Seeker({
         firstName,
         lastName,
@@ -39,7 +39,7 @@ export const register = async (req, res) => {
         passwordHash: hash,
       });
 
-      // Создаем для него РЕЗЮМЕ
+      // Make resume for him
       const resume = new Resume({
         owner: seeker._id,
       });
@@ -51,7 +51,7 @@ export const register = async (req, res) => {
 
       account = seekerData._doc;
     } else if (role === ROLES.employer) {
-      // Создаем нового работодателя
+      // Make new Employer
       const employer = new Employer({
         firstName,
         lastName,
@@ -85,6 +85,7 @@ export const register = async (req, res) => {
       message: 'Register success! Please check your email and activate your account to start',
     });
   } catch (err) {
+    console.log('ERROR [register]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
@@ -126,7 +127,7 @@ export const login = async (req, res) => {
       token: authAccountToken,
     });
   } catch (err) {
-    console.log(err);
+    console.log('ERROR [login]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
@@ -154,8 +155,8 @@ export const verifyEmail = async (req, res) => {
     res.status(200).json({
       message: 'Your account has been successfully verified',
     });
-  } catch (error) {
-    console.log('error', error);
+  } catch (err) {
+    console.log('ERROR [verifyEmail]', err);
     res.status(500).json({ message: RES_ERRORS.internal_server_error });
   }
 };
@@ -187,8 +188,8 @@ export const forgotPassword = async (req, res) => {
     res.status(200).json({
       message: 'An email has been sent to you, use it to reset your password',
     });
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log('ERROR [forgotPassword]', err);
     res.status(500).json({ message: RES_ERRORS.internal_server_error });
   }
 };
@@ -214,8 +215,8 @@ export const resetPassword = async (req, res) => {
     res.status(200).json({
       message: 'Your account password has beeen successfully updated',
     });
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log('ERROR [resetPassword]', err);
     res.status(500).json({ message: RES_ERRORS.internal_server_error });
   }
 };
@@ -233,7 +234,7 @@ export const getMe = async (req, res) => {
     const { passwordHash, __v, ...accountData } = account._doc;
     res.status(200).json({ user: { ...accountData } });
   } catch (err) {
-    console.log(err);
+    console.log('ERROR [getMe]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });

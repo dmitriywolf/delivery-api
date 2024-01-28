@@ -595,7 +595,7 @@ const resetPasswordTemplate = `
                                         color: #5d541d;
                                       "
                                     >
-                                      Thanks for joining Job Magazine!
+                                      Thanks for joining IT Hube!
                                     </h3>
                                     <p
                                       style="
@@ -772,7 +772,7 @@ const resetPasswordTemplate = `
                                         font-size: 14px;
                                       "
                                     >
-                                      Thanks,<br />Job Magazine Team!&nbsp;
+                                      Thanks,<br />IT Hube Team!&nbsp;
                                     </p>
                                   </td>
                                 </tr>

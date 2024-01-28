@@ -13,7 +13,7 @@ export const createMessage = async (req, res) => {
       message,
     });
   } catch (err) {
-    console.log('[createMessage]', err);
+    console.log('ERROR [createMessage]', err);
     res.status(500).json({
       message: 'Не удалось создать сообщение',
     });

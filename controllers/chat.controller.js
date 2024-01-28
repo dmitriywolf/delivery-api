@@ -1,4 +1,25 @@
 import { Chat, Message } from '#root/models/index.js';
+import { RES_ERRORS } from '#root/common/constants.js';
+
+export const getMyChats = async (req, res) => {
+  try {
+    const chats = await Chat.find({ members: { $in: [req.userId] } }).populate('members', [
+      '_id',
+      'firstName',
+      'lastName',
+      'avatar',
+    ]);
+
+    res.status(200).json({
+      chats,
+    });
+  } catch (err) {
+    console.log('ERROR [getChats]', err);
+    res.status(500).json({
+      message: RES_ERRORS.internal_server_error,
+    });
+  }
+};
 
 export const createChat = async (req, res) => {
   try {
@@ -25,29 +46,9 @@ export const createChat = async (req, res) => {
       chatId: savedChat._id,
     });
   } catch (err) {
-    console.log('[createChat]', err);
+    console.log('ERROR [createChat]', err);
     res.status(500).json({
-      message: 'Не удалось создать чат',
-    });
-  }
-};
-
-export const getMyChats = async (req, res) => {
-  try {
-    const chats = await Chat.find({ members: { $in: [req.userId] } }).populate('members', [
-      '_id',
-      'firstName',
-      'lastName',
-      'avatar',
-    ]);
-
-    res.status(200).json({
-      chats,
-    });
-  } catch (err) {
-    console.log('[getChats]', err);
-    res.status(500).json({
-      message: 'Не удалось получить чаты',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -69,9 +70,9 @@ export const getChat = async (req, res) => {
       chat: { ...chat._doc, messages },
     });
   } catch (err) {
-    console.log('[getChat]', err);
+    console.log('ERROR [getChat]', err);
     res.status(500).json({
-      message: 'Не удалось получить чат',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

@@ -1,14 +1,9 @@
 import express from 'express';
-import {
-  // getAllSeekers,
-  // getSeekerById,
-  updateSeekerById,
-} from '#root/controllers/seeker.controller.js';
+import { updateSeeker } from '#root/controllers/seeker.controller.js';
+import { checkAuth } from '#root/middleware/index.js';
 
 const router = express.Router();
 
-// router.get('/', getAllSeekers);
-// router.get('/:id', getSeekerById);
-router.patch('/:id', updateSeekerById);
+router.patch('/:id', checkAuth, updateSeeker);
 
 export default router;

@@ -1,4 +1,5 @@
 import { Notification } from '#root/models/index.js';
+import { RES_ERRORS } from '#root/common/constants.js';
 
 export const getMyNotifications = async (req, res) => {
   try {
@@ -8,9 +9,9 @@ export const getMyNotifications = async (req, res) => {
       notifications,
     });
   } catch (err) {
-    console.log('[getMyNotifications]', err);
+    console.log('ERROR [getMyNotifications]', err);
     res.status(500).json({
-      message: 'Не удалось получить мои оповещания',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -28,9 +29,9 @@ export const readNotification = async (req, res) => {
 
     res.status(200).json({ watchedId: notificationId });
   } catch (err) {
-    console.log('[editDoc]', err);
+    console.log('ERROR [editDoc]', err);
     res.status(500).json({
-      message: 'Не удалось отредактировать оповещание',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

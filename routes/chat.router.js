@@ -5,7 +5,7 @@ import { checkAuth } from '#root/middleware/index.js';
 const router = express.Router();
 
 router.get('/', checkAuth, getMyChats);
-router.get('/:id', getChat);
+router.get('/:id', checkAuth, getChat);
 router.post('/', checkAuth, createChat);
 
 export default router;

@@ -11,5 +11,3 @@ export const updateSeekerValidation = [
   body('github', 'Invalid github').isURL(),
   body('portfolio', 'Invalid portfolio').isURL(),
 ];
-
-export const a = 'ef';

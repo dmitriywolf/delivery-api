@@ -5,4 +5,4 @@ export {
   forgotPasswordValidation,
   resetPasswordValidation,
 } from './auth.js';
-export { updateSeekerValidation } from './profile.js';
+export { updateSeekerValidation } from './seeker.js';

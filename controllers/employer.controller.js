@@ -4,11 +4,17 @@ import { clearImage } from '#root/utils/index.js';
 
 export const getAllEmployers = async (req, res) => {
   try {
+    // Send only published companies
     const employers = await Employer.find({ isPublished: true }).sort({ createdAt: -1 });
 
-    res.status(200).json({ employers });
+    const filteredEmployers = employers.map((e) => {
+      const { __v, passwordHash, ...employerData } = e._doc;
+      return employerData;
+    });
+
+    res.status(200).json({ employers: filteredEmployers });
   } catch (err) {
-    console.log(err);
+    console.log('ERROR [getAllEmployers]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
@@ -18,7 +24,6 @@ export const getAllEmployers = async (req, res) => {
 export const getEmployerById = async (req, res) => {
   try {
     const employerId = req.params.id;
-
     const employer = await Employer.findById(employerId);
 
     if (!employer) {
@@ -37,16 +42,23 @@ export const getEmployerById = async (req, res) => {
 
     res.status(200).json({ user: { ...employerData }, jobs, docs });
   } catch (err) {
-    console.log(err);
+    console.log('ERROR [getEmployerById]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
   }
 };
 
-export const updateEmployerById = async (req, res) => {
+export const updateEmployer = async (req, res) => {
   try {
+    const currentUserId = req.userId;
     const employerId = req.params.id;
+
+    if (currentUserId !== employerId) {
+      return res.status(403).json({
+        message: RES_ERRORS.forbidden,
+      });
+    }
 
     const { firstName, lastName, avatar, phone, linkedin, userPosition } = req.body;
 
@@ -77,16 +89,23 @@ export const updateEmployerById = async (req, res) => {
 
     res.status(200).json({ user: { ...accountData } });
   } catch (err) {
-    console.log('[updateEmpoyer]', err);
+    console.log('ERROR [updateEmpoyer]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });
   }
 };
 
-export const updateCompanyById = async (req, res) => {
+export const updateCompany = async (req, res) => {
   try {
+    const currentUserId = req.userId;
     const employerId = req.params.id;
+
+    if (currentUserId !== employerId) {
+      return res.status(403).json({
+        message: RES_ERRORS.forbidden,
+      });
+    }
 
     const {
       companyName,
@@ -127,7 +146,7 @@ export const updateCompanyById = async (req, res) => {
 
     res.status(200).json({ user: { ...accountData } });
   } catch (err) {
-    console.log('[updateCompany]', err);
+    console.log('ERROR [updateCompany]', err);
     res.status(500).json({
       message: RES_ERRORS.internal_server_error,
     });

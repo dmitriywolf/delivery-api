@@ -1,30 +1,29 @@
 import { Job, Notification, Seeker } from '#root/models/index.js';
-import { NOTIFICATION_TYPES } from '#root/common/constants.js';
+import { NOTIFICATION_TYPES, RES_ERRORS } from '#root/common/constants.js';
 
 export const getAllJobs = async (req, res) => {
   try {
     const jobs = await Job.find().populate('author').sort({ createdAt: -1 });
-    res.status(200).json({
-      jobs,
-    });
-  } catch (err) {
-    console.log('[getAllJobs]', err);
-    res.status(500).json({
-      message: 'Не удалось получить вакансии',
-    });
-  }
-};
 
-export const getTotalJobsCount = async (req, res) => {
-  try {
-    const jobs = await Job.find();
+    const filteredJobs = jobs.map((j) => {
+      const { author, ...jobData } = j._doc;
+      const { __v, passwordHash, ...authorData } = author._doc;
+
+      return {
+        ...jobData,
+        author: {
+          ...authorData,
+        },
+      };
+    });
+
     res.status(200).json({
-      total: jobs.length,
+      jobs: filteredJobs,
     });
   } catch (err) {
-    console.log('[gettotalJobs]', err);
+    console.log('ERROR [getAllJobs]', err);
     res.status(500).json({
-      message: 'Не удалось получить количество вакансий',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -45,8 +44,6 @@ export const getJobById = async (req, res) => {
 
     const job = result._doc;
 
-    console.log(job);
-
     const { passwordHash, __v, ...authorView } = job.author._doc;
 
     res.status(200).json({
@@ -58,10 +55,10 @@ export const getJobById = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log('[getJobById]', err);
+    console.log('ERROR [getJobById]', err);
 
     res.status(500).json({
-      message: 'Не удалось получить вакансию',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -110,13 +107,14 @@ export const createJob = async (req, res) => {
     console.log('ERROR [createJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось создать вакансию',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
 
 export const updateJob = async (req, res) => {
   try {
+    const currentUserId = req.userId;
     const jobId = req.params.id;
 
     const {
@@ -135,6 +133,14 @@ export const updateJob = async (req, res) => {
       employment,
       isArchive,
     } = req.body;
+
+    const job = await Job.findById(jobId);
+
+    if (currentUserId !== job.author.toString()) {
+      return res.status(403).json({
+        message: RES_ERRORS.forbidden,
+      });
+    }
 
     const updatedJob = await Job.findOneAndUpdate(
       { _id: jobId },
@@ -166,7 +172,7 @@ export const updateJob = async (req, res) => {
     console.log('ERROR [updateJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось обновить вакансию',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -231,10 +237,10 @@ export const applyToJob = async (req, res) => {
 
     res.status(201).json({ seekerId });
   } catch (err) {
-    console.log('[applyToJob]', err);
+    console.log('ERROR [applyToJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось получить вакансию',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -247,12 +253,24 @@ export const getMyApplications = async (req, res) => {
       .populate('author')
       .sort({ createdAt: -1 });
 
-    res.status(200).json({ applications });
+    const filteredApplications = applications.map((j) => {
+      const { author, ...jobData } = j._doc;
+      const { __v, passwordHash, ...authorData } = author._doc;
+
+      return {
+        ...jobData,
+        author: {
+          ...authorData,
+        },
+      };
+    });
+
+    res.status(200).json({ applications: filteredApplications });
   } catch (err) {
-    console.log('[applyToJob]', err);
+    console.log('ERROR [applyToJob]', err);
 
     res.status(500).json({
-      message: 'Не удалось получить мои отклики',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

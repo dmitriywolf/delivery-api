@@ -1,17 +1,31 @@
 import { Resume } from '#root/models/index.js';
+import { RES_ERRORS } from '#root/common/constants.js';
 
 export const getAllResumes = async (req, res) => {
   try {
     const resumes = await Resume.find({ isPublished: true })
       .populate('owner')
       .sort({ createdAt: -1 });
+
+    const filteredResumes = resumes.map((r) => {
+      const { owner, ...resumeData } = r._doc;
+      const { __v, passwordHash, ...ownerData } = owner._doc;
+
+      return {
+        ...resumeData,
+        owner: {
+          ...ownerData,
+        },
+      };
+    });
+
     res.status(200).json({
-      resumes,
+      resumes: filteredResumes,
     });
   } catch (err) {
-    console.log('[getAllResumes]', err);
+    console.log('ERROR [getAllResumes]', err);
     res.status(500).json({
-      message: 'Не удалось получить резюме',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -21,14 +35,22 @@ export const getResumeById = async (req, res) => {
     const resumeId = req.params.id;
     const resume = await Resume.findOne({ _id: resumeId }).populate('owner');
 
+    const { owner, ...resumeData } = resume._doc;
+    const { __v, passwordHash, ...ownerData } = owner._doc;
+
     res.status(200).json({
-      resume,
+      resume: {
+        ...resumeData,
+        owner: {
+          ...ownerData,
+        },
+      },
     });
   } catch (err) {
-    console.log('[getResumeById]', err);
+    console.log('ERROR [getResumeById]', err);
 
     res.status(500).json({
-      message: 'Не удалось получить резюме',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -41,17 +63,18 @@ export const getMyResume = async (req, res) => {
       resume,
     });
   } catch (err) {
-    console.log('[getMyResume]', err);
-
+    console.log('ERROR [getMyResume]', err);
     res.status(500).json({
-      message: 'Не удалось получить резюме',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
 
-export const updateResumeById = async (req, res) => {
+export const updateResume = async (req, res) => {
   try {
+    const currentUserId = req.userId;
     const resumeId = req.params.id;
+
     const {
       position,
       category,
@@ -68,6 +91,14 @@ export const updateResumeById = async (req, res) => {
       dontConsider,
       isPublished,
     } = req.body;
+
+    const resume = await Resume.findById(resumeId);
+
+    if (currentUserId !== resume.owner.toString()) {
+      return res.status(403).json({
+        message: RES_ERRORS.forbidden,
+      });
+    }
 
     const updatedResume = await Resume.findOneAndUpdate(
       { _id: resumeId },
@@ -96,10 +127,10 @@ export const updateResumeById = async (req, res) => {
       resume: updatedResume,
     });
   } catch (err) {
-    console.log('[updateResumeById]', err);
+    console.log('ERROR [updateResumeById]', err);
 
     res.status(500).json({
-      message: 'Не удалось обновить резюме',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

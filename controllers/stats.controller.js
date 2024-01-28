@@ -1,5 +1,10 @@
 import { Resume, Job, Employer } from '#root/models/index.js';
-import { EXPERIENCE_LEVELS, EMPLOYMENT, ENGLISH_LEVELS } from '#root/common/constants.js';
+import {
+  EXPERIENCE_LEVELS,
+  EMPLOYMENT,
+  ENGLISH_LEVELS,
+  RES_ERRORS,
+} from '#root/common/constants.js';
 
 export const getTotalStat = async (req, res) => {
   try {
@@ -18,9 +23,9 @@ export const getTotalStat = async (req, res) => {
       ],
     });
   } catch (err) {
-    console.log('[getLevelStat]', err);
+    console.log('ERROR [getTotalStat]', err);
     res.status(500).json({
-      message: 'Не удалось получить статистику',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -45,9 +50,9 @@ export const getLevelStat = async (req, res) => {
       stat,
     });
   } catch (err) {
-    console.log('[getLevelStat]', err);
+    console.log('ERROR [getLevelStat]', err);
     res.status(500).json({
-      message: 'Не удалось получить статистику',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -70,9 +75,9 @@ export const getSalaryExpectationStat = async (req, res) => {
       stat,
     });
   } catch (err) {
-    console.log('[getLevelStat]', err);
+    console.log('ERROR [getSalaryExpectationStat]', err);
     res.status(500).json({
-      message: 'Не удалось получить статистику',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -107,9 +112,9 @@ export const getEnglishStat = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log('[getLevelStat]', err);
+    console.log('ERROR [getEnglishStat]', err);
     res.status(500).json({
-      message: 'Не удалось получить статистику',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -134,10 +139,9 @@ export const getEmploymentStat = async (req, res) => {
       stat,
     });
   } catch (err) {
-    console.log('[getEmploymentStat]', err);
-
+    console.log('ERROR [getEmploymentStat]', err);
     res.status(500).json({
-      message: 'Не удалось получить статистику',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };
@@ -177,10 +181,9 @@ export const getNotConsiderDomainsStat = async (req, res) => {
       stat: [statPercentage],
     });
   } catch (err) {
-    console.log('[getNotConsiderDomainsStat]', err);
-
+    console.log('ERROR [getNotConsiderDomainsStat]', err);
     res.status(500).json({
-      message: 'Не удалось получить статистику',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

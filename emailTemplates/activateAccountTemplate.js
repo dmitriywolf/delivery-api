@@ -594,7 +594,7 @@ const activateAccountTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tr
                                         color: #5d541d;
                                       "
                                     >
-                                      Thanks for joining Job Magazin!
+                                      Thanks for joining IT Hub!
                                     </h3>
                                     <p
                                       style="
@@ -773,7 +773,7 @@ const activateAccountTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tr
                                         font-size: 14px;
                                       "
                                     >
-                                      Thanks,<br />Job Magazine Team!&nbsp;
+                                      Thanks,<br />IT Hube Team!&nbsp;
                                     </p>
                                   </td>
                                 </tr>

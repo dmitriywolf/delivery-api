@@ -23,10 +23,10 @@ export default async function sendMail({ to, userName, emailLink, subject, templ
   await new Promise((resolve, reject) => {
     transporter.verify((error, success) => {
       if (error) {
-        console.log(error);
+        console.log('ERROR [Verify connection]', error);
         reject(error);
       } else {
-        console.log('server is listening...');
+        console.log('Mail, verify connection');
         resolve(success);
       }
     });
@@ -43,10 +43,10 @@ export default async function sendMail({ to, userName, emailLink, subject, templ
   await new Promise((resolve, reject) => {
     transporter.sendMail(options, (err, info) => {
       if (err) {
-        console.error(err);
+        console.error('ERROR [Send mail]', err);
         reject(err);
       } else {
-        console.log(info);
+        console.log('Mail, send mail', info);
         resolve(info);
       }
     });

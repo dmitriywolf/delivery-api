@@ -7,16 +7,14 @@ import {
   getMyVacancies,
   applyToJob,
   getMyApplications,
-  getTotalJobsCount,
 } from '#root/controllers/job.controller.js';
-import { checkAuth, checkIsSeeker } from '#root/middleware/index.js';
+import { checkAuth, checkIsSeeker, checkIsEmployer } from '#root/middleware/index.js';
 
 const router = express.Router();
 
 router.get('/', getAllJobs);
-router.get('/total', getTotalJobsCount);
 router.get('/:id', getJobById);
-router.post('/', checkAuth, createJob);
+router.post('/', checkAuth, checkIsEmployer, createJob);
 router.patch('/:id', checkAuth, updateJob);
 
 router.get('/employer/all', checkAuth, getMyVacancies);

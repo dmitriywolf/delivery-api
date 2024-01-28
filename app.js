@@ -70,7 +70,7 @@ app.use(cors());
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('HELLO TO JOB MAGAZINE API');
+  res.send('HELLO TO IT HUB API');
 });
 app.use('/api/auth', authRouter);
 app.use('/api/seekers', seekerRouter);

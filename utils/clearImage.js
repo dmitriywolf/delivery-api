@@ -12,5 +12,5 @@ export default function clearImage(filePath) {
   }
   const fp = path.join(__dirname, '..', filePath);
 
-  fs.unlink(fp, (err) => console.log(err));
+  fs.unlink(fp, (err) => console.log('ERROR [clearImage]', err));
 }
