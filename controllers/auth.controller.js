@@ -2,17 +2,14 @@ import bcrypt from 'bcrypt';
 import { RES_ERRORS, ROLES } from '#root/common/constants.js';
 import { Account, Seeker, Employer, Resume } from '#root/models/index.js';
 import {
-  // createVerifyEmailToken,
+  createVerifyEmailToken,
   checkVerifyEmailToken,
   createResetPasswordToken,
   checkResetPasswordToken,
   createAuthToken,
   sendMail,
 } from '#root/utils/index.js';
-import {
-  // activateAccountTemplate,
-  resetPasswordTemplate,
-} from '#root/emailTemplates/index.js';
+import { activateAccountTemplate, resetPasswordTemplate } from '#root/emailTemplates/index.js';
 
 export const register = async (req, res) => {
   try {
@@ -70,21 +67,19 @@ export const register = async (req, res) => {
       });
     }
 
-    console.log(account);
+    const activatAccountToken = createVerifyEmailToken({
+      _id: account._id,
+    });
 
-    // const activatAccountToken = createVerifyEmailToken({
-    //   _id: account._id,
-    // });
+    const activateUrl = `${process.env.FRONT_DOMAIN}/auth/verify-email/${activatAccountToken}`;
 
-    // const activateUrl = `${process.env.FRONT_DOMAIN}/auth/verify-email/${activatAccountToken}`;
-
-    // await sendMail({
-    //   to: account.email,
-    //   userName: `${account.firstName} ${account.lastName}`,
-    //   emailLink: activateUrl,
-    //   subject: 'Verify your email address',
-    //   template: activateAccountTemplate,
-    // });
+    await sendMail({
+      to: account.email,
+      userName: `${account.firstName} ${account.lastName}`,
+      emailLink: activateUrl,
+      subject: 'Verify your email address',
+      template: activateAccountTemplate,
+    });
 
     res.status(201).json({
       message: 'Register success! Please check your email and activate your account to start',

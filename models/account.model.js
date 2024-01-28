@@ -18,7 +18,7 @@ const AccountSchema = new mongoose.Schema(
     },
     emailVerified: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     passwordHash: {
       type: String,
