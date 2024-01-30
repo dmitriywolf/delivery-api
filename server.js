@@ -46,18 +46,15 @@ io.on('connection', (socket) => {
   });
 
   // send and get message
-  socket.on('sendMessage', ({ _id, senderId, receiverId, content }) => {
-    console.log('SEND MESSAGE', {
-      _id,
-      senderId,
-      content,
-    });
+  socket.on('sendMessage', ({ _id, senderId, receiverId, content, chatId, senderName }) => {
     const user = getUser(receiverId);
 
     io.to(user?.socketId).emit('getMessage', {
       _id,
       senderId,
       content,
+      chatId,
+      senderName,
     });
   });
 
