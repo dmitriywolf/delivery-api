@@ -1,4 +1,5 @@
 import { Message } from '#root/models/index.js';
+import { RES_ERRORS } from '#root/common/constants.js';
 
 export const createMessage = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ export const createMessage = async (req, res) => {
   } catch (err) {
     console.log('ERROR [createMessage]', err);
     res.status(500).json({
-      message: 'Не удалось создать сообщение',
+      message: RES_ERRORS.internal_server_error,
     });
   }
 };

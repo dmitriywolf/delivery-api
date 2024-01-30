@@ -3,15 +3,22 @@ import { RES_ERRORS } from '#root/common/constants.js';
 
 export const getMyChats = async (req, res) => {
   try {
-    const chats = await Chat.find({ members: { $in: [req.userId] } }).populate('members', [
-      '_id',
-      'firstName',
-      'lastName',
-      'avatar',
-    ]);
+    const chats = await Chat.find({ members: { $in: [req.userId] } })
+      .sort({ createdAt: -1 })
+      .populate('members', ['_id', 'firstName', 'lastName', 'avatar']);
+
+    const chatsWithLastMessage = await Promise.all(
+      chats.map(async (chat) => {
+        const messages = await Message.find({ chatId: chat._id }).sort({ createdAt: -1 }).limit(1);
+        return {
+          ...chat._doc,
+          messages,
+        };
+      }),
+    );
 
     res.status(200).json({
-      chats,
+      chats: chatsWithLastMessage,
     });
   } catch (err) {
     console.log('ERROR [getChats]', err);
