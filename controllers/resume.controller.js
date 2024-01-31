@@ -35,6 +35,12 @@ export const getResumeById = async (req, res) => {
     const resumeId = req.params.id;
     const resume = await Resume.findOne({ _id: resumeId }).populate('owner');
 
+    if (!resume) {
+      return res.status(404).json({
+        message: 'Resume not found',
+      });
+    }
+
     const { owner, ...resumeData } = resume._doc;
     const { __v, passwordHash, ...ownerData } = owner._doc;
 

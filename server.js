@@ -36,16 +36,15 @@ const getUser = (userId) => users.find((user) => user.userId === userId);
 
 io.on('connection', (socket) => {
   // when ceonnect
-  console.log('a user connected.');
+  console.log('User connected');
 
   // take userId and socketId from user
   socket.on('addUser', (userId) => {
-    console.log('USER ADDED', userId);
     addUser(userId, socket.id);
     io.emit('getUsers', users);
   });
 
-  // send and get message
+  // Send and get message
   socket.on('sendMessage', ({ _id, senderId, receiverId, content, chatId, senderName }) => {
     const user = getUser(receiverId);
 
@@ -58,9 +57,20 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Apply to job
+  socket.on('applyToJob', ({ senderId, receiverId, senderName, jobTitle }) => {
+    const user = getUser(receiverId);
+
+    io.to(user?.socketId).emit('getApplyToJobNotification', {
+      senderId,
+      senderName,
+      jobTitle,
+    });
+  });
+
   // when disconnect
   socket.on('disconnect', () => {
-    console.log('a user disconnected!');
+    console.log('User disconnected!');
     removeUser(socket.id);
     io.emit('getUsers', users);
   });
